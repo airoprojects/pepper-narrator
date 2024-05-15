@@ -1,0 +1,35 @@
+[
+    {
+        "game_id": 1,
+        "status": "active",
+        "round": 1,
+        "night": true,
+        "players": [
+            {
+                "player_id" : 1,
+                "role": "villager",
+                "status": "alive"
+            },
+            {
+                "player_id" : 2,
+                "role": "villager",
+                "status": "alive"
+
+            },
+            {
+                "player_id" : 3,
+                "role": "wolf",
+                "status": "alive"
+
+            },
+            {
+                "player_id" : 4,
+                "role": "villager",
+                "status": "alive"
+
+            }            
+        ]   
+    }
+
+
+]
