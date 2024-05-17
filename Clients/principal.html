@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lupus in Fabula</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="principal.css">
+</head>
+<body>
+  <div class="whiteboard">
+    <h1>Welcome to Lupus in Fabula</h1>
+    <p>Enjoy the game!</p>
+    <button id="switchButton" class="btn btn-primary">Switch to Night Mode</button>
+    <button id="playerInfoButton" class="btn btn-secondary">View Player Info</button>
+        <form id="addPlayerForm">
+          <div class="form-group">
+            <label for="playerName">Player Name:</label>
+            <input type="text" id="playerName" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="playerRole">Player Role:</label>
+            <input type="text" id="playerRole" class="form-control" required>
+          </div>
+          <button type="submit" class="btn btn-success">Add Player</button>
+        </form>
+  </div>
+
+  <div class="container">
+    <div class="players-box">
+      <h2>Players in the Game</h2>
+      <ul id="playersList">
+        <li>Player 1</li>
+        <li>Player 2</li>
+        <li>Player 3</li>
+        <!-- Add more players as needed -->
+      </ul>
+    </div>
+
+<script src="principal.js"></script> <!-- Link to the external JavaScript file -->
+<script src="add_player.js"></script> <!-- Link to the add_player JavaScript file -->
+
+
+</body>
+</html>
