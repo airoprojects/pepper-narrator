@@ -142,10 +142,6 @@ def initialize_game(max_players=8, enable_test=False):
   new_game = True
 
   if new_game:
-<<<<<<< HEAD
-=======
-    database_filename = "database2.json"
->>>>>>> fdf3d71ac175b2dee48253bc7e1901ffe17c44d4
 
     # set game id
     progressive_id = get_progressive_id(database_filename)
@@ -272,24 +268,4 @@ def initialize_game(max_players=8, enable_test=False):
 
 if __name__ == "__main__":
 
-<<<<<<< HEAD
   initialize_game()
-=======
-  initialize_game()
-
-  # test()
-
-  # Example: Set the semaphore to green after 10 seconds
-  while not stop_event.is_set():
-    set_semaphore('green')
-    print('Semaphore set to green')
-    time.sleep(10)
-
-    set_semaphore('red')
-    print('Semaphore set to red')
-    time.sleep(10)
-
-
-    
-  set_semaphore('red')
->>>>>>> fdf3d71ac175b2dee48253bc7e1901ffe17c44d4
