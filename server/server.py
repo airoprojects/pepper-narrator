@@ -15,8 +15,6 @@ def get_progressive_id(filename):
         return progressive_id
   return None
 
-import json
-
 def update_progressive_id(filename, new_id):
   with open(filename, 'r+') as file:
     # Read the first part of the file where "progressive_id" is located
@@ -193,9 +191,9 @@ def initialize_game(max_players=8, enable_test=False):
       for player in game_info['players']:
         is_alive = (player['status'] == "alive")
         if is_alive and player['player_id'] == player_to_kill:
-          if player['role'] == "wolf":
-            # TODO: send this message to the client 
-            raise  Exception("Error: wolves cannot kill each others")
+          # if player['role'] == "wolf":
+          #   # TODO: send this message to the client 
+          #   raise  Exception("Error: wolves cannot kill each others")
           print(f"killing: {player['player_id']}")
           player['status'] = "dead"
           alive_no_wolves -= 1
@@ -240,14 +238,17 @@ def initialize_game(max_players=8, enable_test=False):
       else:
         alive_no_wolves -= 1
     
-
     # update the state of the game
     save_cache(cache_filename, game_info)
 
     # TODO: check for stop condictions
-    if alive_wolves <= 0:
+    if alive_wolves <= 0 :
       # TODO: make pepper say this
       print("villagers win")
+      break
+    elif alive_wolves > alive_no_wolves:
+      # TODO: make pepper say this
+      print("wolves win")
       break
 
     game_info['round'] += 1
