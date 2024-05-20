@@ -80,14 +80,14 @@ def add_players(players, current_roles, max_players, enable_test=False):
       player_info['player_id'] = qr_code
       player_info['status'] = "alive"
       player_info['votes'] = 0
-      
       players.append(player_info)
 
-    # TODO: change this to work with pepper chat
+    
     if num_players < max_players:
       if enable_test: 
         new_player = True
         continue
+      # TODO: change this to work with pepper chat
       new_player = input("Is there another player that want to take part at the game? ").lower()
       new_player = re.fullmatch(pattern, new_player)
 
@@ -127,6 +127,10 @@ def assign_roles(
 def save_cache(cache_filename, game_info):
   with open(cache_filename, "w") as game_file:
     json.dump(game_info, game_file, indent=4)
+
+
+def update_state():
+  ...
 
 
 def initialize_game(max_players=8, enable_test=False):
@@ -206,11 +210,17 @@ def initialize_game(max_players=8, enable_test=False):
     save_cache(cache_filename, game_info)
     
     # TODO: get a list of votes for each charater form the web page
-    foo = {"player_code_1": 5}
+    foo = {"player_code_1": 5, "player_code_4": 5}
+    max_votes = max(foo.values())
 
+    # TODO: find max in foo insead of list of all plyers
+    candidates = []
     for player in game_info['players']:
       if player['player_id'] in foo.keys():
-        player['votes'] = foo[player['player_id']]
+        votes = foo[player['player_id']]
+        player['votes'] = votes
+        if votes == max_votes:
+          candidates.append(players)
 
     # update the state of all the players during day
     if not game_info['night']:
@@ -232,6 +242,7 @@ def initialize_game(max_players=8, enable_test=False):
       
       else:
         # TODO: here notify the client to do anoter voting
+        # TODO: update candidates
         ...
 
       game_info['players'][candidate_id]['status'] = "dead"
