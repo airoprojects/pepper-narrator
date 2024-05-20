@@ -1,37 +1,55 @@
 {
     "progressive_id": 0,
+    "players": {
+        "renzo" : {
+            "games": 3,
+            "victories": 1
+        },
+        "lucia" : {
+            "games": 5,
+            "victories": 3
+        }
+    },
     "games": [
-        "game_id": 0,
-        "status": "inactive",
-        "round": 1,
-        "night": false,
-        "players": [
-            {
-                "player_id": "player_code_2",
-                "status": "dead",
-                "votes": 0,
-                "role": "villager"
-            },
-            {
-                "player_id": "player_code_4",
-                "status": "alive",
-                "votes": 0,
-                "role": "villager"
-            },
-            {
-                "player_id": "player_code_3",
-                "status": "alive",
-                "votes": 0,
-                "role": "villager"
-            },
-            {
-                "player_id": "player_code_1",
-                "status": "dead",
-                "votes": 5,
-                "role": "wolf"
-            }
-        ]
-    ]
+        {
+            "game_id": 0,
+            "status": "inactive",
+            "round": 1,
+            "night": false,
+            "players": [
+                {
+                        "player_id": "player_code_1",
+                        "status": "dead",
+                        "votes": 5,
+                        "role": "villager"
+                    },
+                    {
+                        "player_id": "player_code_4",
+                        "status": "alive",
+                        "votes": 0,
+                        "role": "villager"
+                    },
+                    {
+                        "player_id": "player_code_3",
+                        "status": "alive",
+                        "votes": 0,
+                        "role": "wolf"
+                    },
+                    {
+                        "player_id": "player_code_5",
+                        "status": "alive",
+                        "votes": 0,
+                        "role": "villager"
+                    },
+                    {
+                        "player_id": "player_code_2",
+                        "status": "dead",
+                        "votes": 0,
+                        "role": "wolf"
+                    }
+                ]
+        }
+    ],
     "empty_symbol": ""
 }
 
