@@ -5,6 +5,8 @@ import json
 import random
 import threading
 
+from utils import load_data_from_json, save_data_to_json
+
 def get_progressive_id(filename):
   with open(filename, 'r') as file:
     for line in file:
@@ -59,7 +61,7 @@ def add_role(current_roles):
   current_roles.append(role)
 
 
-def add_players(players, current_roles, max_players, enable_test=False):
+def add_players(players, current_roles, max_players, tts, memory, dialog, logger, enable_test=False):
    
   # game set-up paramters
   num_players = 0
@@ -81,13 +83,13 @@ def add_players(players, current_roles, max_players, enable_test=False):
       
       players.append(player_info)
 
-    # TODO: change this to work with pepper chat
+    # TODO: change this to work with pepper chat -> dialog in Choregraphe
     if num_players < max_players:
       if enable_test: 
         new_player = True
         continue
-      new_player = input("Is there another player that want to take part at the game? ").lower()
-      new_player = re.fullmatch(pattern, new_player)
+      new_player = raw_input("Is there another player that want to take part at the game? ").lower()
+      new_player = re.match(pattern, new_player)
 
     else:
        print("Reached maximum number of players!")
@@ -122,32 +124,27 @@ def assign_roles(
     else: alive_no_wolves += 1
 
 
-def save_cache(cache_filename, game_info):
-  with open(cache_filename, "w") as game_file:
-    json.dump(game_info, game_file, indent=4)
-
-
-def initialize_game(max_players=8, enable_test=False):
+def initialize_game(tts, memory, dialog, database, logger, max_players=8, enable_test=False):
 
   # game parametrs
-  database_filename = "database.json"
   players = []
   current_roles = []
   alive_wolves = 0
   alive_no_wolves = 0
-
+  
   # TODO: ask the human if start a new game or continue an old one
   new_game = True
 
   if new_game:
 
     # set game id
-    progressive_id = get_progressive_id(database_filename)
-    print(f"Current progressive_id: {progressive_id}")
+    progressive_id = database['progressive_id']
+    logger.info("Current progressive_id: {}".format(progressive_id))
     new_progressive_id = progressive_id + 1
-    print(f"New progressive_id: {new_progressive_id}")
+    database['progressive_id'] += 1
+    logger.info("New progressive_id: {}".format(new_progressive_id))
 
-    cache_filename = f"game_{new_progressive_id}_cache.json"
+    cache_filename = "game_{}_cache.json".format(new_progressive_id)
 
     # initialize cache database for new game
     game_info = {
@@ -160,9 +157,10 @@ def initialize_game(max_players=8, enable_test=False):
   
   else:
     # TODO: load old game
-    ...
+    pass
 
-  add_players(players, current_roles, max_players)
+  add_players(players, current_roles, max_players, tts, memory, dialog, logger)
+  
   assign_roles(
     game_info, 
     players, 
@@ -170,12 +168,17 @@ def initialize_game(max_players=8, enable_test=False):
     alive_wolves, 
     alive_no_wolves
   ) 
-  save_cache(cache_filename, game_info) # initialize new game
+  save_data_to_json(cache_filename, game_info) # initialize new game
+  
+  return (game_info, alive_wolves, alive_no_wolves)
+  
 
+def game(game_info, alive_wolves, alive_no_wolves, cache_filename):
+  
   while True:
 
-    print(f"alive villagers: {alive_no_wolves}")
-    print(f"alive wolves: {alive_wolves}")
+    print("alive villagers: {}".format(alive_no_wolves))
+    print("alive wolves: {}".format(alive_wolves))
   
     # TODO: implement here the game logic 
     # TODO: wait for the response from the web
@@ -194,14 +197,14 @@ def initialize_game(max_players=8, enable_test=False):
           # if player['role'] == "wolf":
           #   # TODO: send this message to the client 
           #   raise  Exception("Error: wolves cannot kill each others")
-          print(f"killing: {player['player_id']}")
+          print("killing: {}".format(player['player_id']))
           player['status'] = "dead"
           alive_no_wolves -= 1
           break
 
     # update the state of the game
     game_info['night'] = False
-    save_cache(cache_filename, game_info)
+    save_data_to_json(cache_filename, game_info)
     
     # TODO: get a list of votes for each charater form the web page
     foo = {"player_code_1": 5}
@@ -230,7 +233,7 @@ def initialize_game(max_players=8, enable_test=False):
       
       else:
         # TODO: here notify the client to do anoter voting
-        ...
+        pass
 
       game_info['players'][candidate_id]['status'] = "dead"
       if game_info['players'][candidate_id]['role'] == "wolf":
@@ -239,7 +242,7 @@ def initialize_game(max_players=8, enable_test=False):
         alive_no_wolves -= 1
     
     # update the state of the game
-    save_cache(cache_filename, game_info)
+    save_data_to_json(cache_filename, game_info)
 
     # TODO: check for stop condictions
     if alive_wolves <= 0 :
@@ -259,11 +262,7 @@ def initialize_game(max_players=8, enable_test=False):
 
   # termination
   game_info['status'] = "inactive"
-  save_cache(cache_filename, game_info)
-
-  # update database with final game 
-  update_progressive_id(database_filename, new_progressive_id)
-
+  save_data_to_json(cache_filename, game_info)
 
 
 
