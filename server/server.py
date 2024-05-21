@@ -35,33 +35,16 @@ def update_progressive_id(filename, new_id):
     file.flush()
 
 
-def add_role(current_roles):
-  """
-  Make a list of roles depending on the number of players
-  """
-  role = "villager"
-  curr_num_players = (len(current_roles) + 1)
-  num_of_wolves = current_roles.count("wolf")
-  
-  # check if there are  enough wolves
-  if curr_num_players % 2 == 0:
-    wolf_cap = (curr_num_players // 2) - 1  
-  else:
-    wolf_cap = (curr_num_players // 2)
-  if num_of_wolves < wolf_cap:
-    role = "wolf"
-
-  # add expansion roles if there are enough players
-  if curr_num_players >= 6 and ("seer" not in  current_roles):
-    role = "seer"
-
-  if curr_num_players >= 8 and ("medium" not in  current_roles):
-    role = "medium"
-     
-  current_roles.append(role)
-
-
-def add_players(players, current_roles, max_players, tts, memory, dialog, logger, enable_test=False):
+def add_players(
+    players, 
+    current_roles, 
+    max_players, 
+    tts, 
+    memory, 
+    dialog, 
+    logger, 
+    enable_test=False
+):
    
   # game set-up paramters
   num_players = 0
@@ -105,7 +88,30 @@ def add_players(players, current_roles, max_players, tts, memory, dialog, logger
     else:
        pass
 
+def add_role(current_roles):
+  """
+  Make a list of roles depending on the number of players
+  """
+  role = "villager"
+  curr_num_players = (len(current_roles) + 1)
+  num_of_wolves = current_roles.count("wolf")
+  
+  # check if there are  enough wolves
+  if curr_num_players % 2 == 0:
+    wolf_cap = (curr_num_players // 2) - 1  
+  else:
+    wolf_cap = (curr_num_players // 2)
+  if num_of_wolves < wolf_cap:
+    role = "wolf"
 
+  # add expansion roles if there are enough players
+  if curr_num_players >= 6 and ("seer" not in  current_roles):
+    role = "seer"
+
+  if curr_num_players >= 8 and ("medium" not in  current_roles):
+    role = "medium"
+     
+  current_roles.append(role)
 def assign_roles(
     game_info, 
     players, 
@@ -124,7 +130,15 @@ def assign_roles(
     else: alive_no_wolves += 1
 
 
-def initialize_game(tts, memory, dialog, database, logger, max_players=8, enable_test=False):
+def initialize_game(
+    tts, 
+    memory, 
+    dialog, 
+    database, 
+    logger, 
+    max_players=8, 
+    enable_test=False
+):
 
   # game parametrs
   players = []
@@ -155,28 +169,89 @@ def initialize_game(tts, memory, dialog, database, logger, max_players=8, enable
         "players": []   
     }
   
+
+    add_players(players, current_roles, max_players, tts, memory, dialog, logger)
+    
+    assign_roles(
+      game_info, 
+      players, 
+      current_roles, 
+      alive_wolves, 
+      alive_no_wolves
+    ) 
+    save_data_to_json(cache_filename, game_info) # initialize new game
+  
   else:
     # TODO: load old game
     pass
 
-  add_players(players, current_roles, max_players, tts, memory, dialog, logger)
-  
-  assign_roles(
-    game_info, 
-    players, 
-    current_roles, 
-    alive_wolves, 
-    alive_no_wolves
-  ) 
-  save_data_to_json(cache_filename, game_info) # initialize new game
-  
   return (game_info, alive_wolves, alive_no_wolves)
   
+
+def update_state_night(
+    game_info, 
+    player_to_kill, 
+    cache_filename, 
+    alive_no_wolves
+):
+  
+  for player in game_info['players']:
+    is_alive = (player['status'] == "alive")
+
+    if is_alive and player['player_id'] == player_to_kill:
+      if player['role'] == "wolf":
+        # TODO: send this message to the client 
+        raise  Exception("Error: wolves cannot kill each others")
+      
+      print("killing: {}".format(player['player_id']))
+      player['status'] = "dead"
+      alive_no_wolves -= 1
+      break
+
+  # update the state of the game
+  game_info['night'] = False
+  save_data_to_json(cache_filename, game_info)
+
+
+def update_state_day(game_info, players_votes, cache_filename):
+  candidates = []
+  max_votes = max(players_votes.values())
+
+  # check for the players with the maximum nuber of votes
+  for player, votes in players_votes.items():
+    if votes == max_votes:
+      candidates.append(player)
+  
+  # 
+  for player in game_info['players']:
+    if player['player_id'] in players_votes.keys():
+      votes = players_votes[player['player_id']]
+      player['votes'] = votes
+      if votes == max_votes :
+        candidates.append(player['player_id'])
+
+  if len(candidates) == 1:
+    candidate_id = game_info['players'].index(candidates[0])
+      
+  else:
+    # TODO: here notify the client to do anoter voting
+    pass
+
+  game_info['players'][candidate_id]['status'] = "dead"
+  if game_info['players'][candidate_id]['role'] == "wolf":
+    alive_wolves -= 1
+  else:
+    alive_no_wolves -= 1
+    
+  # update the state of the game
+  save_data_to_json(cache_filename, game_info)
+
 
 def game(game_info, alive_wolves, alive_no_wolves, cache_filename):
   
   while True:
 
+    # just for debug
     print("alive villagers: {}".format(alive_no_wolves))
     print("alive wolves: {}".format(alive_wolves))
   
@@ -184,67 +259,84 @@ def game(game_info, alive_wolves, alive_no_wolves, cache_filename):
     # TODO: wait for the response from the web
     # TODO: get id of player_to kill
 
-    player_to_kill = "player_code_2" # to get from the web
+    # with open(cache_filename, "r") as game_file:
+    #   game_info = json.load(game_file)
 
-    with open(cache_filename, "r") as game_file:
-      game_info = json.load(game_file)
+    game_info = load_data_from_json(cache_filename)
 
-    # update the state of all the players during night
     if game_info['night']:
-      for player in game_info['players']:
-        is_alive = (player['status'] == "alive")
-        if is_alive and player['player_id'] == player_to_kill:
-          # if player['role'] == "wolf":
-          #   # TODO: send this message to the client 
-          #   raise  Exception("Error: wolves cannot kill each others")
-          print("killing: {}".format(player['player_id']))
-          player['status'] = "dead"
-          alive_no_wolves -= 1
-          break
-
-    # update the state of the game
-    game_info['night'] = False
-    save_data_to_json(cache_filename, game_info)
-    
-    # TODO: get a list of votes for each charater form the web page
-    foo = {"player_code_1": 5}
-
-    for player in game_info['players']:
-      if player['player_id'] in foo.keys():
-        player['votes'] = foo[player['player_id']]
-
-    # update the state of all the players during day
-    if not game_info['night']:
-      # TODO: filter the players that are alive with the majority of votes
-      candidates = filter(
-        lambda x: (
-          x['votes'] == max(
-            game_info['players'], key=lambda y: y['votes']
-          )['votes']
-          and 
-          x['status'] == "alive"
-        ),
-        game_info['players']
+      player_to_kill = "player_code_2" # to get from the web
+      update_state_night(
+        game_info, 
+        player_to_kill, 
+        cache_filename,
+        alive_no_wolves,
       )
 
-      candidates = list(candidates)
-      if len(candidates) == 1:
-        candidate_id = game_info['players'].index(candidates[0])
-      
-      else:
-        # TODO: here notify the client to do anoter voting
-        pass
+    # update the state of all the players during night
+    # if game_info['night']:
+    #   for player in game_info['players']:
+    #     is_alive = (player['status'] == "alive")
+    #     if is_alive and player['player_id'] == player_to_kill:
+    #       # if player['role'] == "wolf":
+    #       #   # TODO: send this message to the client 
+    #       #   raise  Exception("Error: wolves cannot kill each others")
+    #       print("killing: {}".format(player['player_id']))
+    #       player['status'] = "dead"
+    #       alive_no_wolves -= 1
+    #       break
 
-      game_info['players'][candidate_id]['status'] = "dead"
-      if game_info['players'][candidate_id]['role'] == "wolf":
-        alive_wolves -= 1
-      else:
-        alive_no_wolves -= 1
+    # # update the state of the game
+    # game_info['night'] = False
+    # save_data_to_json(cache_filename, game_info)
     
-    # update the state of the game
-    save_data_to_json(cache_filename, game_info)
+    else:
+      # TODO: get a list of votes for each charater form the web page
+      players_votes = {"player_code_1": 5}
+      update_state_day(
+        game_info, 
+        players_votes, 
+        cache_filename,
+        alive_wolves, 
+        alive_no_wolves
+      )
 
-    # TODO: check for stop condictions
+    # for player in game_info['players']:
+    #   if player['player_id'] in foo.keys():
+    #     player['votes'] = foo[player['player_id']]
+
+    # # update the state of all the players during day
+    # if not game_info['night']:
+    #   # TODO: filter the players that are alive with the majority of votes
+    #   candidates = filter(
+    #     lambda x: (
+    #       x['votes'] == max(
+    #         game_info['players'], key=lambda y: y['votes']
+    #       )['votes']
+    #       and 
+    #       x['status'] == "alive"
+    #     ),
+    #     game_info['players']
+    #   )
+
+    #   candidates = list(candidates)
+    #   if len(candidates) == 1:
+    #     candidate_id = game_info['players'].index(candidates[0])
+      
+    #   else:
+    #     # TODO: here notify the client to do anoter voting
+    #     pass
+
+    #   game_info['players'][candidate_id]['status'] = "dead"
+    #   if game_info['players'][candidate_id]['role'] == "wolf":
+    #     alive_wolves -= 1
+    #   else:
+    #     alive_no_wolves -= 1
+    
+    # # update the state of the game
+    # save_data_to_json(cache_filename, game_info)
+
+    # stop condiction
     if alive_wolves <= 0 :
       # TODO: make pepper say this
       print("villagers win")
@@ -256,8 +348,6 @@ def game(game_info, alive_wolves, alive_no_wolves, cache_filename):
 
     game_info['round'] += 1
     break
-
-
     # end of loop
 
   # termination
@@ -265,7 +355,6 @@ def game(game_info, alive_wolves, alive_no_wolves, cache_filename):
   save_data_to_json(cache_filename, game_info)
 
 
-
 if __name__ == "__main__":
 
-  initialize_game()
+  game()

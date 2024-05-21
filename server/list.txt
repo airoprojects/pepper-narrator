@@ -1,0 +1,34 @@
+FUNCTIONS
+
+0. initialize_game() / load_game()
+
+1. add_player(players, player_name) -> players
+"This function takes in input a player name and adds it to the player list"
+### NOTE: this can by done  directly by pepper ###
+
+2. add_role(current_roles) -> update current_roles
+" This function keeps track of the possible roles for the upcoming game"
+
+3. assign_roles(game_info, players, current_roles, alive_wolves, alive_no_wolves) -> update cache_database
+
+4. update_state_night(game_info, player_to_kill, cache_filename, alive_no_wolves) -> update cache_database
+
+5.  update_state_day(game_info, players_votes, cache_filename, alive_no_wolves, alive_wolves) -> update cache_database
+
+6. update_database(game_info) -> update main database
+
+
+POSSIBLE FLOW
+
+1. pepper starts
+2. first user interaction
+3. pepper check the database to see if it knows the user (if not add him to the database)
+4. pepper ask if start new game or load old game
+    4.1 if start new game pepper initialize and empty game and a cache database
+        4.1.1 pepper enters in a loop to register players for the new game and call the function to add the role to the list (here the same mechanism of point 3. is applied)
+        4.1.2 pepper exit the loop when num_players >= 4
+        4.1.3 pepper call the function to assign the role to the each players
+    4.2 else
+        4.2.1 pepper call the function to load the game from the database to the current cache database
+5. pepper enter in the game loop when it call all the function to update the current state of the game until the stop condition
+6. pepper update the main database with the played game
