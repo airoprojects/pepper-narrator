@@ -4,7 +4,7 @@ language: enu
 concept:(ready) [ready go start hi]
 concept: (new) [new start "new game"]
 concept: (continue) [old continue "past one" cache]
-concept: (yes) [yes y si yep]
+concept: (yes) [yes y si yep ok]
 concept: (no) [no n nope]
 
 # Catching inputs and triggering outputs
@@ -14,11 +14,19 @@ u:(~ready) ^nextProposal
 
 proposal: Greetings, brave souls! I am your ruthless game master, Peppe, here to guide you through the bloody adventure of Lupus in Fabula. ^nextProposal
 
-proposal: Do you wanna start a new game or you want to continue a past one?
-    u1:(~new) Great! Are you ready to judge and betray you brothers? Please take a seat and tell me your names one at a time. $next_player_id=1 ^goto(name)
+proposal: %selection Do you wanna start a new game or you want to continue a past one?
+    u1:(~new) %newGame Great! Are you ready to judge and betray your brothers? Please take a seat and tell me your names one at a time. $next_player_id=1 ^goto(name)
     u1:(~continue) What's the game id?
         u2: (_*) $recovered_game_id=$1
-    u1:(nothing) ^goto(end)
+    u1:([nothing ~no]) ^goto(end)
+
+proposal: %endedGameId Why don't you start a new game?
+    u1:(~yes) ^gotoReactivate(newGame)
+    u1:(~no) ^goto(end)
+
+proposal: %wrongGameId Why don't you sharpen your lying skills in a new game?
+    u1:(~yes) ^gotoReactivate(newGame)
+    u1:(~no) ^goto(end)
 
 proposal: %name Player $next_player_id, tell me your name
     u1: (_*) $last_player_name=$1
