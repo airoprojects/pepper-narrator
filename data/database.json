@@ -1,0 +1,54 @@
+{
+    "progressive_id": 5, 
+    "empty_symbol": "", 
+    "games": [
+        {
+            "status": "inactive", 
+            "game_id": 0, 
+            "night": false, 
+            "round": 1, 
+            "players": [
+                {
+                    "player_id": "player_code_1", 
+                    "status": "dead", 
+                    "votes": 5, 
+                    "role": "villager"
+                }, 
+                {
+                    "player_id": "player_code_4", 
+                    "status": "alive", 
+                    "votes": 0, 
+                    "role": "villager"
+                }, 
+                {
+                    "player_id": "player_code_3", 
+                    "status": "alive", 
+                    "votes": 0, 
+                    "role": "wolf"
+                }, 
+                {
+                    "player_id": "player_code_5", 
+                    "status": "alive", 
+                    "votes": 0, 
+                    "role": "villager"
+                }, 
+                {
+                    "player_id": "player_code_2", 
+                    "status": "dead", 
+                    "votes": 0, 
+                    "role": "wolf"
+                }
+            ]
+        }
+    ], 
+    "players": {
+        "renzo": {
+            "victories": 1, 
+            "games": 3
+        }, 
+        "lucia": {
+            "victories": 3, 
+            "games": 5
+        }
+    }
+}
