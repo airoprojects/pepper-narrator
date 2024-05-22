@@ -1,54 +1,76 @@
 {
-    "progressive_id": 5, 
+    "progressive_id": 1, 
     "empty_symbol": "", 
     "games": [
         {
-            "status": "inactive", 
-            "game_id": 0, 
-            "night": false, 
-            "round": 1, 
+            "status": "active", 
+            "roles": [
+                "seer", 
+                "villager", 
+                "wolf", 
+                "villager", 
+                "wolf", 
+                "villager", 
+                "medium", 
+                "wolf"
+            ], 
+            "alive": [
+                true, 
+                true, 
+                true, 
+                true, 
+                true, 
+                true, 
+                true, 
+                true
+            ], 
             "players": [
-                {
-                    "player_id": "player_code_1", 
-                    "status": "dead", 
-                    "votes": 5, 
-                    "role": "villager"
-                }, 
-                {
-                    "player_id": "player_code_4", 
-                    "status": "alive", 
-                    "votes": 0, 
-                    "role": "villager"
-                }, 
-                {
-                    "player_id": "player_code_3", 
-                    "status": "alive", 
-                    "votes": 0, 
-                    "role": "wolf"
-                }, 
-                {
-                    "player_id": "player_code_5", 
-                    "status": "alive", 
-                    "votes": 0, 
-                    "role": "villager"
-                }, 
-                {
-                    "player_id": "player_code_2", 
-                    "status": "dead", 
-                    "votes": 0, 
-                    "role": "wolf"
-                }
-            ]
+                "bojack", 
+                "princess", 
+                "diane", 
+                "goodboy", 
+                "todd", 
+                "beatrice", 
+                "herb", 
+                "sarah"
+            ], 
+            "night": true, 
+            "game_id": 1, 
+            "round": 1
         }
     ], 
     "players": {
-        "renzo": {
-            "victories": 1, 
-            "games": 3
+        "goodboy": {
+            "victories": 0, 
+            "games": 1
         }, 
-        "lucia": {
-            "victories": 3, 
-            "games": 5
+        "sarah": {
+            "victories": 0, 
+            "games": 1
+        }, 
+        "herb": {
+            "victories": 0, 
+            "games": 1
+        }, 
+        "beatrice": {
+            "victories": 0, 
+            "games": 1
+        }, 
+        "diane": {
+            "victories": 0, 
+            "games": 1
+        }, 
+        "bojack": {
+            "victories": 0, 
+            "games": 1
+        }, 
+        "todd": {
+            "victories": 0, 
+            "games": 1
+        }, 
+        "princess": {
+            "victories": 0, 
+            "games": 1
         }
     }
 }
