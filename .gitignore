@@ -166,3 +166,6 @@ old/
 # Server stuff
 server/tests.py
 server/*cache.json
+
+# Cache stuff
+*cache.json

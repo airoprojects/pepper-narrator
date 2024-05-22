@@ -1,0 +1,34 @@
+topic: ~game_initialization()
+language: enu
+
+concept:(ready) [ready go start hi]
+concept: (new) [new start "new game"]
+concept: (continue) [old continue "past one" cache]
+concept: (yes) [yes y si yep]
+concept: (no) [no n nope]
+
+# Catching inputs and triggering outputs
+# u:(e:onStart) $onStopped=1 
+
+u:(~ready) ^nextProposal 
+
+proposal: Greetings, brave souls! I am your ruthless game master, Peppe, here to guide you through the bloody adventure of Lupus in Fabula. ^nextProposal
+
+proposal: Do you wanna start a new game or you want to continue a past one?
+    u1:(~new) Great! Are you ready to judge and betray you brothers? Please take a seat and tell me your names one at a time. $next_player_id=1 ^goto(name)
+    u1:(~continue) What's the game id?
+        u2: (_*) $recovered_game_id=$1
+    u1:(nothing) ^goto(end)
+
+proposal: %name Player $next_player_id, tell me your name
+    u1: (_*) $last_player_name=$1
+
+proposal: %ask_more_players Are there more players?
+    u1:(~yes) ^gotoReactivate(name)
+    u1:(~no) ^goto(end_init_new)
+
+proposal: %full Great, We are full! ^goto(end_init_new)
+
+proposal: %end_init_new Game starting! $state="ready_new"
+proposal: %end_init_old The show must go on! $state="ready_old"
+proposal: %end Damn! $onStopped=1 $state="end" 
