@@ -10,19 +10,18 @@ from utils import load_data_from_json, save_data_to_json
 def recovery_game_handler(game_id, tts, memory, dialog, database, game_info):
     tts.say("Let me check if game #" + str(game_id) + " can be restored...")
     
-    for game in database['games']:
-        if str(game['game_id']) == game_id:
-            if game['status'] == 'active':
-                for key, value in game.items():
-                    game_info[key] = value
-                dialog.gotoTag("end_init_old", "game_initialization")
-            else:
-                tts.say("Recovery is not always possible, everything has an end.")
-                dialog.gotoTag("endedGameId", "game_initialization")
-            return None
-            
-    tts.say("Do not lie to me, this game never existed.")
-    dialog.gotoTag("wrongGameId", "game_initialization")
+    if str(game_id) in database['games']:
+        game = database['games'][str(game_id)]
+        if game['status'] == 'active':
+            for key, value in game.items():
+                game_info[key] = value
+            dialog.gotoTag("end_init_old", "game_initialization")
+        else:
+            tts.say("Recovery is not always possible, everything has an end.")
+            dialog.gotoTag("endedGameId", "game_initialization")
+    else:
+        tts.say("Do not lie to me, this game never existed.")
+        dialog.gotoTag("wrongGameId", "game_initialization")
     
 
 def new_player_handler(last_player_name, tts, memory, dialog, database, max_players, game_info):
@@ -73,7 +72,7 @@ def initialize_game(tts, memory, dialog, database, logger, max_players=8):
     game_info = {
         "game_id": database['progressive_id'] + 1,
         "status": "active",
-        "round": 1,
+        "round": 0,
         "night": True,
         "players": [],
         "roles": [],
@@ -101,3 +100,103 @@ def initialize_game(tts, memory, dialog, database, logger, max_players=8):
         database['progressive_id'] += 1
     
     return game_info
+
+
+def game(game_info, tts, memory, dialog, database, logger):
+    game_initialization_topic =  '/home/robot/playground/pepper-narrator/pepper/topics/game_loop.top'
+    topic_name = dialog.loadTopic(game_initialization_topic)
+    dialog.activateTopic(topic_name)
+    dialog.subscribe('game_loop')
+    winning_team = None
+    
+    # TODO connect for state (pause -> save/stop)
+    
+    print(game_info['players'])
+    print(game_info['roles'])
+    
+    while memory.getData("state") == "game_loop":
+        game_info['round'] += 1
+        print("Round {}, {}".format(game_info['round'], "night" if game_info['night'] else "day"))
+        
+        if game_info['night']:
+            tts.say("It is night, close your eyes.")
+            memory.insertData("game_state", "night") # for server callback
+            tts.say("Wolves, you have to choose your victim.")
+            
+            # TODO get player_to_kill from the server
+            killable_players = []
+            for i in range(len(game_info['players'])):
+                if game_info['roles'][i] != 'wolf' and game_info['alive'][i]:
+                    killable_players.append( game_info['players'][i] )
+            player_to_kill = game_info['players'].index(random.choice(killable_players)) 
+            
+            game_info['alive'][player_to_kill] = False
+            player_to_kill_name =  game_info['players'][player_to_kill]
+            tts.say("The sun is rising. You can open your eyes again.")
+            tts.say("I\'m so sorry to tell you that {} is dead, what a tragedy.".format(player_to_kill_name.upper()))
+            game_info['night'] = False
+            print(player_to_kill, player_to_kill_name)
+            print(game_info['alive'])
+            
+        else:
+            tts.say("Now you must decide who is responsible for this!")
+      
+            majority = False
+            while not majority:
+                memory.insertData("game_state", "voting")
+                
+                # TODO: get a list of votes for each charater form the web page
+                players_votes = [0] * len(game_info['players'])
+                for _ in range( game_info['alive'].count(True) ):
+                    players_votes[ random.randint(0, len(players_votes) - 1) ] += 1
+
+                max_votes = max(players_votes)
+                print(max_votes, players_votes)
+                if players_votes.count( max_votes ) > 1:
+                    print("again")
+                    tts.say("Please vote again. You must be more united in your choice.")
+                    tts.say("X and Y, what do you have to say about your innocence?") # TODO improve using names of most voted players
+                else:
+                    majority = True
+                    player_to_kill = players_votes.index(max_votes) 
+                    player_to_kill_name =  game_info['players'][player_to_kill]
+                    tts.say("So you all agree that {} is responsible, interesting...".format(player_to_kill_name.upper()))
+                    game_info['alive'][player_to_kill] = False
+                    game_info['night'] = True
+                    print(player_to_kill, player_to_kill_name)
+                    print(game_info['alive'])
+        
+        alive_wolves = [ game_info["roles"][i] == "wolf" and game_info["alive"][i] for i in range(len(game_info["players"])) ].count(True)
+        alive_no_wolves = [ game_info["roles"][i] != "wolf" and game_info["alive"][i] for i in range(len(game_info["players"])) ].count(True)
+        print("alive villagers: {}".format(alive_no_wolves))
+        print("alive wolves: {}".format(alive_wolves))  
+        # stop conditions
+        if alive_wolves == 0 :
+            winning_team = "villagers"
+            tts.say("Villagers win")
+            memory.insertData("state", "end")
+            memory.insertData("game_state", "end")
+            memory.insertData("winning_team", winning_team)
+        elif alive_wolves >= alive_no_wolves:
+            winning_team = "wolves"
+            tts.say("Wolves win")
+            memory.insertData("state", "end")          
+            memory.insertData("game_state", "end")
+            memory.insertData("winning_team", winning_team)
+
+    # termination
+    game_info['status'] = "inactive"
+    game_info['winning_team'] = winning_team
+    print("game id: {}".format(game_info['game_id']))
+    database['games'][ str(game_info['game_id']) ] = game_info
+    for i in range(len(game_info['players'])):
+        player_name = game_info['players'][i]
+        if winning_team == 'wolves' and game_info['roles'][i] == 'wolf':
+            database['players'][player_name]['victories'] += 1
+        elif winning_team == 'villagers' and game_info['roles'][i] != 'wolf':
+            database['players'][player_name]['victories'] += 1
+        
+    dialog.unsubscribe('game_loop')
+    dialog.deactivateTopic(topic_name)
+    dialog.unloadTopic(topic_name)
+    
