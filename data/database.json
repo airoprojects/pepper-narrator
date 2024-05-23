@@ -1,8 +1,8 @@
 {
     "progressive_id": 1, 
     "empty_symbol": "", 
-    "games": [
-        {
+    "games": {
+        "1": {
             "status": "active", 
             "roles": [
                 "seer", 
@@ -36,9 +36,9 @@
             ], 
             "night": true, 
             "game_id": 1, 
-            "round": 1
+            "round": 0
         }
-    ], 
+    }, 
     "players": {
         "goodboy": {
             "victories": 0, 
