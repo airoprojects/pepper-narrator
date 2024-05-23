@@ -29,14 +29,12 @@ def main():
     memory.insertData("state", "initialization")
     game_info = initialize_game(tts, memory, dialog, database, logger)
     
-    if memory.getData("state") == "end": 
-        return None
+    if memory.getData("state") == "end": return None
     
     tts.say("Starting...")
     memory.insertData("state", "game_loop")
     game(game_info, tts, memory, dialog, database, logger)
     save_data_to_json(database_filename, database)
-    tts.say("Game ended and data saved")
     
     return 0
     

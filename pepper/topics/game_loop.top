@@ -11,8 +11,10 @@ concept: (stop) [stop basta pause]
 # Catching inputs and triggering outputs
 # u:(e:onStart) $onStopped=1 
 
-u:(~stop) Ok, do you want to save the game?
-    u1:(~yes) Ok, I'll tell you the game id so you can continue next time. $state=saving
-    u1:(~no) Ok, bye. $state=end
+u:(~stop) Ok, do you want to save the game? $state=paused
+    u1:(~yes) Ok, I'll tell you the game id so you can continue next time. $state=save ^goto(end_save)
+    u1:(~no) Ok, bye. $state=end_forced ^goto(end_no_save)
 
+proposal: %end_save Game Saved! $onStopped=1 $state=end
+proposal: %end_no_save Exit without saving $onStopped=1 $state=end
 proposal: %end Game Ended! $onStopped=1 $state=end

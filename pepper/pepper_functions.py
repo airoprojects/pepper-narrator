@@ -5,7 +5,7 @@ import json
 import random
 import threading
 
-from utils import load_data_from_json, save_data_to_json
+from utils import save_data_to_json
 
 def recovery_game_handler(game_id, tts, memory, dialog, database, game_info):
     tts.say("Let me check if game #" + str(game_id) + " can be restored...")
@@ -102,14 +102,30 @@ def initialize_game(tts, memory, dialog, database, logger, max_players=8):
     return game_info
 
 
+def get_night_votation(game_info):
+    # TODO get player_to_kill from the server
+    killable_players = []
+    for i in range(len(game_info['players'])):
+        if game_info['roles'][i] != 'wolf' and game_info['alive'][i]:
+            killable_players.append( game_info['players'][i] )
+    player_to_kill = game_info['players'].index(random.choice(killable_players)) 
+    return player_to_kill
+
+
+def get_daytime_votation(game_info):
+    # TODO: get a list of votes for each charater form the web page
+    players_votes = [0] * len(game_info['players'])
+    for _ in range( game_info['alive'].count(True) ):
+        players_votes[ random.randint(0, len(players_votes) - 1) ] += 1
+    return players_votes
+
+
 def game(game_info, tts, memory, dialog, database, logger):
     game_initialization_topic =  '/home/robot/playground/pepper-narrator/pepper/topics/game_loop.top'
     topic_name = dialog.loadTopic(game_initialization_topic)
     dialog.activateTopic(topic_name)
     dialog.subscribe('game_loop')
     winning_team = None
-    
-    # TODO connect for state (pause -> save/stop)
     
     print(game_info['players'])
     print(game_info['roles'])
@@ -123,12 +139,7 @@ def game(game_info, tts, memory, dialog, database, logger):
             memory.insertData("game_state", "night") # for server callback
             tts.say("Wolves, you have to choose your victim.")
             
-            # TODO get player_to_kill from the server
-            killable_players = []
-            for i in range(len(game_info['players'])):
-                if game_info['roles'][i] != 'wolf' and game_info['alive'][i]:
-                    killable_players.append( game_info['players'][i] )
-            player_to_kill = game_info['players'].index(random.choice(killable_players)) 
+            player_to_kill = get_night_votation(game_info)
             
             game_info['alive'][player_to_kill] = False
             player_to_kill_name =  game_info['players'][player_to_kill]
@@ -145,10 +156,7 @@ def game(game_info, tts, memory, dialog, database, logger):
             while not majority:
                 memory.insertData("game_state", "voting")
                 
-                # TODO: get a list of votes for each charater form the web page
-                players_votes = [0] * len(game_info['players'])
-                for _ in range( game_info['alive'].count(True) ):
-                    players_votes[ random.randint(0, len(players_votes) - 1) ] += 1
+                players_votes = get_daytime_votation(game_info)                
 
                 max_votes = max(players_votes)
                 print(max_votes, players_votes)
@@ -173,29 +181,34 @@ def game(game_info, tts, memory, dialog, database, logger):
         # stop conditions
         if alive_wolves == 0 :
             winning_team = "villagers"
+            dialog.gotoTag("end", "game_loop")
             tts.say("Villagers win")
-            memory.insertData("state", "end")
             memory.insertData("game_state", "end")
             memory.insertData("winning_team", winning_team)
         elif alive_wolves >= alive_no_wolves:
             winning_team = "wolves"
+            dialog.gotoTag("end", "game_loop")
             tts.say("Wolves win")
-            memory.insertData("state", "end")          
             memory.insertData("game_state", "end")
             memory.insertData("winning_team", winning_team)
-
-    # termination
-    game_info['status'] = "inactive"
-    game_info['winning_team'] = winning_team
-    print("game id: {}".format(game_info['game_id']))
-    database['games'][ str(game_info['game_id']) ] = game_info
-    for i in range(len(game_info['players'])):
-        player_name = game_info['players'][i]
-        if winning_team == 'wolves' and game_info['roles'][i] == 'wolf':
-            database['players'][player_name]['victories'] += 1
-        elif winning_team == 'villagers' and game_info['roles'][i] != 'wolf':
-            database['players'][player_name]['victories'] += 1
-        
+    
+    if memory.getData("state") == "end":
+        # termination
+        game_info['status'] = "inactive"
+        game_info['winning_team'] = winning_team
+        database['games'][ str(game_info['game_id']) ] = game_info
+        for i in range(len(game_info['players'])):
+            player_name = game_info['players'][i]
+            if winning_team == 'wolves' and game_info['roles'][i] == 'wolf':
+                database['players'][player_name]['victories'] += 1
+            elif winning_team == 'villagers' and game_info['roles'][i] != 'wolf':
+                database['players'][player_name]['victories'] += 1
+        print("saved stats for game #{}".format(game_info['game_id']))
+    else:
+        while memory.getData("state") == "paused": time.sleep(0.1)
+        if memory.getData("state") == "save": 
+            database['games'][ str(game_info['game_id']) ] = game_info
+            
     dialog.unsubscribe('game_loop')
     dialog.deactivateTopic(topic_name)
     dialog.unloadTopic(topic_name)
