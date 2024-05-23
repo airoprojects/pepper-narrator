@@ -6,13 +6,12 @@ concept: (new) [new start "new game"]
 concept: (continue) [old continue "past one" cache]
 concept: (yes) [yes y si yep ok]
 concept: (no) [no n nope]
+concept: (stop) [stop basta pause]
 
 # Catching inputs and triggering outputs
 # u:(e:onStart) $onStopped=1 
 
-u:(~ready) ^nextProposal 
-
-proposal: Greetings, brave souls! I am your ruthless game master, Peppe, here to guide you through the bloody adventure of Lupus in Fabula. ^nextProposal
+u:(~ready) Greetings, brave souls! I am your ruthless game master, Peppe, here to guide you through the bloody adventure of Lupus in Fabula. ^nextProposal
 
 proposal: %selection Do you wanna start a new game or you want to continue a past one?
     u1:(~new) %newGame Great! Are you ready to judge and betray your brothers? Please take a seat and tell me your names one at a time. $next_player_id=1 ^goto(name)
@@ -39,4 +38,5 @@ proposal: %full Great, We are full! ^goto(end_init_new)
 
 proposal: %end_init_new Game starting! $state="ready_new"
 proposal: %end_init_old The show must go on! $state="ready_old"
-proposal: %end Damn! $onStopped=1 $state="end" 
+
+u: (~stop) %end Damn! $onStopped=1 $state="end" 
