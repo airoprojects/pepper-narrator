@@ -102,22 +102,9 @@ def initialize_game(tts, memory, dialog, database, logger, max_players=8):
     return game_info
 
 
-def get_night_votation(game_info):
-    # TODO get player_to_kill from the server
-    killable_players = []
-    for i in range(len(game_info['players'])):
-        if game_info['roles'][i] != 'wolf' and game_info['alive'][i]:
-            killable_players.append( game_info['players'][i] )
-    player_to_kill = game_info['players'].index(random.choice(killable_players)) 
-    return player_to_kill
-
-
-def get_daytime_votation(game_info):
-    # TODO: get a list of votes for each charater form the web page
-    players_votes = [0] * len(game_info['players'])
-    for _ in range( game_info['alive'].count(True) ):
-        players_votes[ random.randint(0, len(players_votes) - 1) ] += 1
-    return players_votes
+def get_votation(memory):
+    while memory.getData('votes') == None: time.sleep(0.5)
+    return memory.getData('votes')
 
 
 def game(game_info, tts, memory, dialog, database, logger):
@@ -132,14 +119,17 @@ def game(game_info, tts, memory, dialog, database, logger):
     
     while memory.getData("state") == "game_loop":
         game_info['round'] += 1
+        memory.insertData('game_info', game_info)
         print("Round {}, {}".format(game_info['round'], "night" if game_info['night'] else "day"))
         
         if game_info['night']:
             tts.say("It is night, close your eyes.")
-            memory.insertData("game_state", "night") # for server callback
+            memory.insertData('votes', None) 
+            memory.insertData("game_state", "voting_night") # for server callback
             tts.say("Wolves, you have to choose your victim.")
+            print("changed game state")
             
-            player_to_kill = get_night_votation(game_info)
+            player_to_kill = get_votation(memory)
             
             game_info['alive'][player_to_kill] = False
             player_to_kill_name =  game_info['players'][player_to_kill]
@@ -154,9 +144,10 @@ def game(game_info, tts, memory, dialog, database, logger):
       
             majority = False
             while not majority:
-                memory.insertData("game_state", "voting")
+                memory.insertData('votes', None) 
+                memory.insertData("game_state", "voting_day") # for server callback
                 
-                players_votes = get_daytime_votation(game_info)                
+                players_votes = get_votation(memory)                
 
                 max_votes = max(players_votes)
                 print(max_votes, players_votes)
