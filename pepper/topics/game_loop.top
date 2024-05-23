@@ -1,0 +1,18 @@
+topic: ~game_loop()
+language: enu
+
+concept:(ready) [ready go start hi]
+concept: (new) [new start "new game"]
+concept: (continue) [old continue "past one" cache]
+concept: (yes) [yes y si yep]
+concept: (no) [no n nope]
+concept: (stop) [stop basta pause]
+
+# Catching inputs and triggering outputs
+# u:(e:onStart) $onStopped=1 
+
+u:(~stop) Ok, do you want to save the game?
+    u1:(~yes) Ok, I'll tell you the game id so you can continue next time. $state=saving
+    u1:(~no) Ok, bye. $state=end
+
+proposal: %end Game Ended! $onStopped=1 $state=end
