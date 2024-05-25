@@ -16,7 +16,7 @@ def format_dictionary_from_memory(item):
 #TODO TAKE INSTEAD FROM SOCKET
 def get_night_votation():
     # id of players that want killer
-    return player_to_kill
+    return ...# player_to_kill
 
 
     
@@ -32,7 +32,7 @@ def simulate_night_votation(game_info):
 #TODO TAKE INSTEAD FROM SOCKET
 def get_daytime_votation():
     # list [g1_votes, ...., gk_votes ]
-    return players_votes
+    return ... # players_votes
 
 
 def simulate_daytime_votation(game_info):
