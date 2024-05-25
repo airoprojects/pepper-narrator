@@ -3,14 +3,19 @@ import time
 import random
 from copy import deepcopy
 import qi
-
+import argparse
 
 from utils import load_data_from_json, save_data_to_json
 from pepper_functions import *        
 
 def main():
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-p','--port', type=str, help="Insert pepper port")
+    args = parser.parse_args()
+
     robot_ip = '127.0.0.1'
-    robot_port = 9559
+    robot_port = int(args.port) if args.port else 9559  
     session = qi.Session()
     session.connect("tcp://{}:{}".format(robot_ip, robot_port))
 

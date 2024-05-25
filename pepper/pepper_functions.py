@@ -120,6 +120,7 @@ def game(game_info, tts, memory, dialog, database, logger):
     while memory.getData("state") == "game_loop":
         game_info['round'] += 1
         memory.insertData('game_info', game_info)
+        # TODO: send to socket
         print("Round {}, {}".format(game_info['round'], "night" if game_info['night'] else "day"))
         
         if game_info['night']:
