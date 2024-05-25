@@ -1,5 +1,5 @@
 {
-    "progressive_id": 1, 
+    "progressive_id": 2, 
     "empty_symbol": "", 
     "games": {
         "1": {
@@ -37,6 +37,31 @@
             "night": true, 
             "game_id": 1, 
             "round": 0
+        }, 
+        "2": {
+            "status": "inactive", 
+            "roles": [
+                "villager", 
+                "villager", 
+                "wolf", 
+                "villager"
+            ], 
+            "alive": [
+                false, 
+                true, 
+                true, 
+                false
+            ], 
+            "players": [
+                "leoos", 
+                "bojack", 
+                "marco", 
+                "sasso"
+            ], 
+            "night": true, 
+            "winning_team": "wolves", 
+            "game_id": 2, 
+            "round": 2
         }
     }, 
     "players": {
@@ -46,6 +71,10 @@
         }, 
         "sarah": {
             "victories": 0, 
+            "games": 1
+        }, 
+        "marco": {
+            "victories": 1, 
             "games": 1
         }, 
         "herb": {
@@ -60,7 +89,15 @@
             "victories": 0, 
             "games": 1
         }, 
+        "sasso": {
+            "victories": 0, 
+            "games": 1
+        }, 
         "bojack": {
+            "victories": 0, 
+            "games": 2
+        }, 
+        "leoos": {
             "victories": 0, 
             "games": 1
         }, 
