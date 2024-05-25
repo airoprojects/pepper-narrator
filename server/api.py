@@ -2,6 +2,7 @@ import qi
 import time
 import random
 from copy import deepcopy
+import socket 
 
 # TODO: implement python client socket here
 
@@ -37,6 +38,10 @@ def get_data(data):
 if __name__ == "__main__":
     # TODO subscription to be fixed
     # simulate()
+
+
+
+
     
     robot_ip = '127.0.0.1'
     robot_port = 9559
