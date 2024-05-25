@@ -169,3 +169,6 @@ server/*cache.json
 
 # Cache stuff
 *cache.json
+
+# Logs
+err_logs
