@@ -18,3 +18,10 @@ To explore some resources used/related to the project look here [resources](reso
 
 - make a series of topics
 
+
+### How to run a simulation simulation
+
+
+
+
+

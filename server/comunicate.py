@@ -6,8 +6,6 @@ TODO
 
 '''
 
-
-
 '''
 The @ symbol in Python is used to denote a decorator.
 \ A decorator is a special type of function that is used to modify the behavior of another function or method. 
