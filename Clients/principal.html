@@ -28,6 +28,11 @@
 
   <div class="container">
     <div class="players-box">
+
+      <p id="message"></p>
+      <p id="number"></p>
+      <button onclick="fetchData()">Get Data from Flask</button>
+      
       <h2>Players in the Game</h2>
       <ul id="playersList">
         <li>Player 1</li>
@@ -37,8 +42,11 @@
       </ul>
     </div>
 
+<input type="number" id="integerInput" placeholder="Enter an integer">
+<button onclick="sendInteger()">Send vote</button>
+
 <script src="principal.js"></script> <!-- Link to the external JavaScript file -->
-<script src="add_player.js"></script> <!-- Link to the add_player JavaScript file -->
+<!-- <script src="add_player.js"></script> Link to the add_player JavaScript file -->
 
 
 </body>
