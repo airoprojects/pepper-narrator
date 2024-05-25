@@ -12,6 +12,15 @@ def format_dictionary_from_memory(item):
     return dictionary
 
 
+
+#TODO TAKE INSTEAD FROM SOCKET
+def get_night_votation():
+    # id of players that want killer
+    return player_to_kill
+
+
+    
+
 def simulate_night_votation(game_info):
     killable_players = []
     for i in range( len(game_info['players']) ):
@@ -19,6 +28,11 @@ def simulate_night_votation(game_info):
             killable_players.append( game_info['players'][i] )
     player_to_kill = game_info['players'].index(random.choice(killable_players)) 
     return player_to_kill
+
+#TODO TAKE INSTEAD FROM SOCKET
+def get_daytime_votation():
+    # list [g1_votes, ...., gk_votes ]
+    return players_votes
 
 
 def simulate_daytime_votation(game_info):
