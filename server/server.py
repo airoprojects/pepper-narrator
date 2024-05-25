@@ -1,48 +1,76 @@
-import qi
-import time
-import random
-from copy import deepcopy
 
-def format_dictionary_from_memory(item):
-    dictionary = {}
-    for key, val in item:
-        if key in ['game_id', 'round', 'progressive_id']: val = int(val)
-        dictionary[key] = val
-    return dictionary
+'''
+TODO
+# Create a new player by sending a POST request to /api/player with JSON data
+'''
 
-def game_state_handler(game_state, memory):
-    game_info = format_dictionary_from_memory(memory.getData('game_info'))
-    if game_state == 'voting_night':
-        # TODO: with flask
-        player_to_kill = [] #simulate_night_votation(game_info)
-        memory.insertData('votes', player_to_kill)
-        print(game_info['round'], player_to_kill)
-    elif game_state == 'voting_day':
-        # TODO: with flask
-        votes = [] #simulate_daytime_votation(game_info)
-        memory.insertData('votes', votes)
-        print(game_info['round'], votes)
+'''
+The @ symbol in Python is used to denote a decorator.
+\ A decorator is a special type of function that is used to modify the behavior of another function or method. 
+In the context of Flask, decorators are used to define routes and handle HTTP requests.
+# '''
 
+# from flask import Flask, request, jsonify
+# from flask_sqlalchemy import SQLAlchemy
 
-def send_data(data):
-    # TODO: send data to the web page via flask
-    ...
+# app = Flask(__name__)
 
-def get_data(data):
-    # TODO: get data page via flask
-    ...
+# # Configure the SQLite database
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///players.db'
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-if __name__ == "__main__":
-    # TODO subscription to be fixed
-    # simulate()
+# db = SQLAlchemy(app)
+
+# if __name__ == '__main__':
+#     app.run(debug=True)
     
-    robot_ip = '127.0.0.1'
-    robot_port = 9559
-    session = qi.Session()
-    session.connect("tcp://{}:{}".format(robot_ip, robot_port))
 
-    memory = session.service("ALMemory")
-    game_state = memory.getData('game_state')
-    print(game_state)
+# "CALCULEMUSSSSSS"
+
+
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+
+
+app = Flask(__name__)
+CORS(app)  # This will enable CORS for all routes
+
+
+@app.route('/submit_integer', methods=['POST'])
+def submit_integer():
+    try:
+        data = request.json
+        if data is None:
+            raise ValueError("No JSON data received")
+
+        integer_value = data.get('integer', None)
+        
+        if integer_value is None or not isinstance(integer_value, int):
+            raise ValueError("Invalid or missing integer")
+
+        # Process the integer value as needed
+        print(f"Received integer: {integer_value}")
+        return jsonify({"status": "success", "integer": integer_value}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 400
     
-    game_state_handler(game_state, memory)
+
+
+@app.route('/get_data')
+def get_data():
+    data = {
+        'message': 'Player eliminated',
+        'number': 42
+    }
+    return jsonify(data)
+
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
+
+
+
+
