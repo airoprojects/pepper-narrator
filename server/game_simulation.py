@@ -66,13 +66,17 @@ if __name__ == "__main__":
     # TODO subscription to be fixed
     # simulate()
     
-    robot_ip = '127.0.0.1'
+    robot_ip = '127.0.0.1' #'127.0.0.1'
     robot_port = 9559
+    # app = qi.Application(["game_simulation", "--qi-url=tcp://{}:{}".format(robot_ip, robot_port)])
+    # app.start()
     session = qi.Session()
     session.connect("tcp://{}:{}".format(robot_ip, robot_port))
 
+    print(session)
+
     memory = session.service("ALMemory")
-    game_state = memory.getData('game_state')
-    print(game_state)
+    # game_state = memory.getData('game_state')
+    # print(game_state)
     
-    game_state_handler(game_state, memory)
+    # game_state_handler(game_state, memory)
