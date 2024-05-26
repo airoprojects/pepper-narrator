@@ -1,49 +1,17 @@
-'''
-TODO
-# Create a new player by sending a POST request to /api/player with JSON data
-'''
-
-'''
-The @ symbol in Python is used to denote a decorator.
-\ A decorator is a special type of function that is used to modify the behavior of another function or method. 
-In the context of Flask, decorators are used to define routes and handle HTTP requests.
-# '''
-
-# from flask import Flask, request, jsonify
-# from flask_sqlalchemy import SQLAlchemy
-
-# app = Flask(__name__)
-
-# # Configure the SQLite database
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///players.db'
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-# db = SQLAlchemy(app)
-
-# if __name__ == '__main__':
-#     app.run(debug=True)
-    
-
-# "CALCULEMUSSSSSS"
-
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import socket
+import time
 from copy import deepcopy
 from threading import Thread
 
-
 app = Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
-game_info = dict()
-player_vote = dict() # a dict that represents a votation on players! Reset every votation
 
+game_info = {}  # Shared dictionary to store game info
+game_status = 'inactive'  # Initial game status
 
-
-# @app.route('/submit_votation', methods=['POST'])
-# def submit_votation():
-#     return None
+player_vote = dict()  # A dict that represents a votation on players; reset every votation
 
 @app.route('/submit_integer', methods=['POST'])
 def submit_integer():
@@ -63,24 +31,25 @@ def submit_integer():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 400
 
-
 @app.route('/get_data')
 def send_data():
-    global game_info
+    global game_info, game_status
     data = {
-        'game_info': game_info
+        'game_info': game_info,
+        'game_status': game_status
     }
     return jsonify(data)
 
-@app.route('/get_data')
+@app.route('/request_status')
 def send_status():
-    global game_info
+    global game_status
     data = {
-        'game_info': game_info
+        'game_status': game_status
     }
     return jsonify(data)
 
-def  listen(host, port):
+def listen(host, port):
+    global game_info, game_status
     # Create a socket object
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     
@@ -92,8 +61,6 @@ def  listen(host, port):
     
     print(f"Waiting for a connection... on port {port}")
 
-    global game_info
-    
     conn, addr = s.accept()
     with conn:
         print('Connected by', addr)
@@ -104,20 +71,21 @@ def  listen(host, port):
             print("Received data:", data.decode('utf-8'))
             game_info = deepcopy(data.decode('utf-8'))
             
+            # Update game_status based on game_info
+            if 'active' in game_info:
+                game_status = 'active'
+            else:
+                game_status = 'inactive'
+            
             # Send a response
             conn.sendall("Data received".encode('utf-8'))
-            
 
 if __name__ == '__main__':
-    
-    # socket configuratin
-    # Configuration
+    # Socket configuration
     host = '0.0.0.0'
     port = 65432
 
-    socket_thread = Thread(target = listen, args = (host, port))
+    socket_thread = Thread(target=listen, args=(host, port))
     socket_thread.start()
-    # socket_thread.join()
-    # print("thread finished...exiting")
     
     app.run(debug=True)
