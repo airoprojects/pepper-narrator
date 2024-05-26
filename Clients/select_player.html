@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Players</title>
+</head>
+<body>
+    <h1>Players List</h1>
+    <div id="playersList"></div>
+
+    <script>
+        // Sample function to simulate fetching players from a server FLASK
+        function fetchPlayers() {
+            return [
+                { id: 1, name: 'Player One' },
+                { id: 2, name: 'Player Two' },
+                { id: 3, name: 'Player Three' },
+            ];
+        }
+
+        function generatePlayerButtons(players) {
+            const playersListDiv = document.getElementById('playersList');
+            players.forEach(player => {
+                const button = document.createElement('button');
+                button.textContent = player.name;
+                button.onclick = () => {
+                    window.location.href = `player.html?id=${player.id}`;
+                };
+                playersListDiv.appendChild(button);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const players = fetchPlayers();
+            // game fetch from server
+            
+            let game = 'start';
+            if ( game == 'start'){
+              generatePlayerButtons(players);
+            }
+            else {
+              welcome_text = document.getElementById('playersList');
+              welcome_text.appendChild(document.createTextNode('Hello Tabula'));
+
+            }
+        });
+    </script>
+</body>
+</html>
