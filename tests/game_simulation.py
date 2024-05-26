@@ -16,11 +16,10 @@ def format_dictionary_from_memory(item):
 #TODO TAKE INSTEAD FROM SOCKET
 def get_night_votation():
     # id of players that want killer
-    return ...# player_to_kill
+    return [] # player_to_kill
 
 
     
-
 def simulate_night_votation(game_info):
     killable_players = []
     for i in range( len(game_info['players']) ):
@@ -32,7 +31,7 @@ def simulate_night_votation(game_info):
 #TODO TAKE INSTEAD FROM SOCKET
 def get_daytime_votation():
     # list [g1_votes, ...., gk_votes ]
-    return ... # players_votes
+    return [] # players_votes
 
 
 def simulate_daytime_votation(game_info):
@@ -90,7 +89,7 @@ if __name__ == "__main__":
     print(session)
 
     memory = session.service("ALMemory")
-    # game_state = memory.getData('game_state')
-    # print(game_state)
+    game_state = memory.getData('game_state')
+    print(game_state)
     
-    # game_state_handler(game_state, memory)
+    game_state_handler(game_state, memory)

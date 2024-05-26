@@ -1,4 +1,3 @@
-
 '''
 TODO
 # Create a new player by sending a POST request to /api/player with JSON data
