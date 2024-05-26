@@ -21,6 +21,7 @@
 
         function generatePlayerButtons(players) {
             const playersListDiv = document.getElementById('playersList');
+            playersListDiv.innerHTML = ''; // Clear previous content
             players.forEach(player => {
                 const button = document.createElement('button');
                 button.textContent = player.name;
@@ -31,19 +32,35 @@
             });
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const players = fetchPlayers();
-            // game fetch from server
-            
-            let game = 'start';
-            if ( game == 'start'){
-              generatePlayerButtons(players);
-            }
-            else {
-              welcome_text = document.getElementById('playersList');
-              welcome_text.appendChild(document.createTextNode('Hello Tabula'));
 
+        async function fetchStatus() {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/request_status');
+                const data = await response.json();
+                return data.game_status;
+            } catch (error) {
+                console.error('Error:', error);
+                return 'inactive'; // Default to 'inactive' on error
             }
+        }
+
+        async function checkGameStatus() {
+            const players = fetchPlayers();
+            let game_status = await fetchStatus();
+            console.log(game_status);
+            
+            if (game_status === 'active') {
+                generatePlayerButtons(players);
+            } else {
+                const welcome_text = document.getElementById('playersList');
+                welcome_text.innerHTML = ''; // Clear previous content
+                welcome_text.appendChild(document.createTextNode('Hello Tabula'));
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkGameStatus(); // Check the status immediately when the page loads
+            setInterval(checkGameStatus, 5000); // Check the status every 5 seconds
         });
     </script>
 </body>

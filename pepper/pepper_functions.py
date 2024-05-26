@@ -7,6 +7,7 @@ import threading
 
 from utils import save_data_to_json
 
+
 def recovery_game_handler(game_id, tts, memory, dialog, database, game_info):
     tts.say("Let me check if game #" + str(game_id) + " can be restored...")
     
