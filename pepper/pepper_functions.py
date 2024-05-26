@@ -77,7 +77,8 @@ def initialize_game(tts, memory, dialog, database, logger, max_players=8):
         "night": True,
         "players": [],
         "roles": [],
-        "alive": []
+        "alive": [],
+        "vote": [],
     }
     
     subscriber_name = memory.subscriber("last_player_name")
@@ -97,6 +98,7 @@ def initialize_game(tts, memory, dialog, database, logger, max_players=8):
     
     if memory.getData("state") == "ready_new":
         game_info["alive"] = [True for players in game_info["players"]]
+        game_info["vote"] = [False for players in game_info["players"]]
         game_info["roles"] = assign_roles(game_info["players"])
         database['progressive_id'] += 1
     
@@ -128,8 +130,17 @@ def game(game_info, tts, memory, dialog, database, logger):
             tts.say("It is night, close your eyes.")
             memory.insertData('votes', None) 
             memory.insertData("game_state", "voting_night") # for server callback
+
+            # wolves can now vote
+            for idx, value in enumerate(zip(game_info["roles"], game_info["alive"])):
+                role, alive = value
+                if role == "wolf" and alive: game_info["vote"][idx] = True
             tts.say("Wolves, you have to choose your victim.")
+
+            # uptate game info to tell web page who can vote
+            memory.insertData('game_info', game_info)
             print("changed game state")
+            print(game_info['vote'])
             
             player_to_kill = get_votation(memory)
             
@@ -138,25 +149,38 @@ def game(game_info, tts, memory, dialog, database, logger):
             tts.say("The sun is rising. You can open your eyes again.")
             tts.say("I\'m so sorry to tell you that {} is dead, what a tragedy.".format(player_to_kill_name.upper()))
             game_info['night'] = False
+            
+            # disable vote
+            game_info["vote"] = [False for players in game_info["players"]]
+            
             print(player_to_kill, player_to_kill_name)
             print(game_info['alive'])
             
         else:
+
+            # everyone can now vote
+            for idx, alive in enumerate(game_info["alive"]):
+                if alive: game_info["vote"][idx] = True
             tts.say("Now you must decide who is responsible for this!")
       
             majority = False
             while not majority:
                 memory.insertData('votes', None) 
                 memory.insertData("game_state", "voting_day") # for server callback
-                
-                players_votes = get_votation(memory)                
-
+                players_votes = get_votation(memory) # suppose that this list is complete !!!             
                 max_votes = max(players_votes)
                 print(max_votes, players_votes)
+                
                 if players_votes.count( max_votes ) > 1:
                     print("again")
                     tts.say("Please vote again. You must be more united in your choice.")
-                    tts.say("X and Y, what do you have to say about your innocence?") # TODO improve using names of most voted players
+                    tie_players = [id for id in range(len(players_votes)) if players_votes[id] == max_votes]
+                    msg = " ".join(game_info['player'][id] for id in tie_players) + "what do you have to say about your innocence?"
+                    tts.say(msg) # TODO improve using names of most voted players
+                    # tts.say("X and Y, what do you have to say about your innocence?") # TODO improve using names of most voted players
+                    # disable voting for tie players
+                    for id in tie_players:
+                        game_info['vote'][id] = False
                 else:
                     majority = True
                     player_to_kill = players_votes.index(max_votes) 
@@ -166,11 +190,15 @@ def game(game_info, tts, memory, dialog, database, logger):
                     game_info['night'] = True
                     print(player_to_kill, player_to_kill_name)
                     print(game_info['alive'])
+
+            # disable vote
+            game_info["vote"] = [False for players in game_info["players"]]
         
         alive_wolves = [ game_info["roles"][i] == "wolf" and game_info["alive"][i] for i in range(len(game_info["players"])) ].count(True)
         alive_no_wolves = [ game_info["roles"][i] != "wolf" and game_info["alive"][i] for i in range(len(game_info["players"])) ].count(True)
         print("alive villagers: {}".format(alive_no_wolves))
         print("alive wolves: {}".format(alive_wolves))  
+
         # stop conditions
         if alive_wolves == 0 :
             winning_team = "villagers"
@@ -197,6 +225,7 @@ def game(game_info, tts, memory, dialog, database, logger):
             elif winning_team == 'villagers' and game_info['roles'][i] != 'wolf':
                 database['players'][player_name]['victories'] += 1
         print("saved stats for game #{}".format(game_info['game_id']))
+
     else:
         while memory.getData("state") == "paused": time.sleep(0.1)
         if memory.getData("state") == "save": 

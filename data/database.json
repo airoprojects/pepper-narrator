@@ -34,34 +34,19 @@
                 "herb", 
                 "sarah"
             ], 
+            "vote": [
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
             "night": true, 
             "game_id": 1, 
             "round": 0
-        }, 
-        "2": {
-            "status": "inactive", 
-            "roles": [
-                "villager", 
-                "villager", 
-                "wolf", 
-                "villager"
-            ], 
-            "alive": [
-                false, 
-                true, 
-                true, 
-                false
-            ], 
-            "players": [
-                "leoos", 
-                "bojack", 
-                "marco", 
-                "sasso"
-            ], 
-            "night": true, 
-            "winning_team": "wolves", 
-            "game_id": 2, 
-            "round": 2
         }
     }, 
     "players": {
@@ -95,7 +80,7 @@
         }, 
         "bojack": {
             "victories": 0, 
-            "games": 2
+            "games": 1
         }, 
         "leoos": {
             "victories": 0, 

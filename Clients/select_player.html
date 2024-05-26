@@ -8,53 +8,50 @@
 <body>
     <h1>Players List</h1>
     <div id="playersList"></div>
-
+    <script src="client.js"></script>
     <script>
-        // Sample function to simulate fetching players from a server FLASK
-        function fetchPlayers() {
-            return [
-                { id: 1, name: 'Player One' },
-                { id: 2, name: 'Player Two' },
-                { id: 3, name: 'Player Three' },
-            ];
-        }
+
+        // fetch data from flask server
+        // async function fetchData() {
+        //     try {
+        //         const response = await fetch('http://127.0.0.1:5000/request_data');
+        //         const data = await response.json();
+        //         console.log(data);  // Logging the entire dictionary
+        //         return data;
+        //     } catch (error) {
+        //         console.error('Error fetching game info:', error);
+        //         return 'inactive'; // Default to 'inactive' on error
+        //     }
+        // }
 
         function generatePlayerButtons(players) {
             const playersListDiv = document.getElementById('playersList');
             playersListDiv.innerHTML = ''; // Clear previous content
-            players.forEach(player => {
+
+            players.forEach((player, index) => {
                 const button = document.createElement('button');
-                button.textContent = player.name;
+                button.textContent = player; // Set the button text to the player's name
+                button.id = `player-${index}`; // Set the button id to the index of the player
                 button.onclick = () => {
-                    window.location.href = `player.html?id=${player.id}`;
+                    window.location.href = `player.html?id=${index}`;
                 };
                 playersListDiv.appendChild(button);
             });
         }
-
-
-        async function fetchStatus() {
-            try {
-                const response = await fetch('http://127.0.0.1:5000/request_status');
-                const data = await response.json();
-                return data.game_status;
-            } catch (error) {
-                console.error('Error:', error);
-                return 'inactive'; // Default to 'inactive' on error
-            }
-        }
-
+        
         async function checkGameStatus() {
-            const players = fetchPlayers();
-            let game_status = await fetchStatus();
-            console.log(game_status);
+            let game_info = await fetchData();
+            const game_status = game_info.status;
+            const players = game_info.players;
+            console.log('game Status:', game_status);
             
             if (game_status === 'active') {
                 generatePlayerButtons(players);
+
             } else {
                 const welcome_text = document.getElementById('playersList');
                 welcome_text.innerHTML = ''; // Clear previous content
-                welcome_text.appendChild(document.createTextNode('Hello Tabula'));
+                welcome_text.appendChild(document.createTextNode('Gratings peasants!!! \nWelcome to the joyful village of Tabula. \nThe sun is low and new exiting night is about to come! \nWhat will happen? \nYou are about to find out!'));
             }
         }
 
@@ -63,5 +60,7 @@
             setInterval(checkGameStatus, 5000); // Check the status every 5 seconds
         });
     </script>
+    
 </body>
+
 </html>

@@ -31,34 +31,21 @@ def submit_integer():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 400
 
-@app.route('/get_data')
-def send_data():
-    global game_info, game_status
-    data = {
-        'game_info': game_info,
-        'game_status': game_status
-    }
-    return jsonify(data)
 
-@app.route('/request_status')
-def send_status():
-    global game_status
+@app.route('/request_data')
+def send_data():
+    global game_info
     data = {
-        'game_status': game_status
+        "info": game_info
     }
-    return jsonify(data)
+    print(f"\nSending data: {game_info} to webpage")
+    return game_info
 
 def listen(host, port):
-    global game_info, game_status
-    # Create a socket object
+    global game_info
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    
-    # Bind the socket to the host and port
     s.bind((host, port))
-    
-    # Listen for incoming connections
     s.listen(1)
-    
     print(f"Waiting for a connection... on port {port}")
 
     conn, addr = s.accept()
@@ -66,16 +53,9 @@ def listen(host, port):
         print('Connected by', addr)
         while True:
             data = conn.recv(1024)
-            if not data:
-                break
-            print("Received data:", data.decode('utf-8'))
+            if not data: break
+            print(f"\nReceived data: {data.decode('utf-8')} \n")
             game_info = deepcopy(data.decode('utf-8'))
-            
-            # Update game_status based on game_info
-            if 'active' in game_info:
-                game_status = 'active'
-            else:
-                game_status = 'inactive'
             
             # Send a response
             conn.sendall("Data received".encode('utf-8'))
@@ -88,4 +68,4 @@ if __name__ == '__main__':
     socket_thread = Thread(target=listen, args=(host, port))
     socket_thread.start()
     
-    app.run(debug=True)
+    app.run(debug=False)
