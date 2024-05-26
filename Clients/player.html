@@ -9,31 +9,28 @@
     <h1>Player Info</h1>
     <div id="playerInfo"></div>
     <div id="voting"></div>
+    <script src="client.js"></script>
 
     <script>
-        // Sample function to simulate fetching player details from a server
-        function fetchPlayerById(id) {
-            const players = {
-                1: { name: 'Player One', vote: true },
-                2: { name: 'Player Two', vote: true},
-                3: { name: 'Player Three', vote: false},
-            };
-            return players[id];
-        }
-
+        // get current id
         function getQueryParam(param) {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get(param);
         }
 
+        async function getGameInfo(){
+            return game_info = await fetchData();
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
+            game_info = setInterval(getGameInfo, 5000); 
             const playerId = getQueryParam('id');
             if (playerId) {
-                const player = fetchPlayerById(playerId);
+                const player = game_info.players[playerId]
                 if (player) {
                     const playerInfoDiv = document.getElementById('playerInfo');
                     playerInfoDiv.innerHTML = `
-                        <p>Name: ${player.name}</p>
+                        <p>Name: ${player}</p>
                     `;
                     if (player.vote) {
                         const playerList = document.getElementById('voting');
@@ -42,7 +39,7 @@
                         select.name = 'playerVotes';
                         select.id = 'playerVotes';
 
-                        // Create option elements
+                        // Create option elemeents
                         const options = ['Option 1', 'Option 2', 'Option 3']; // Replace with actual options
                         options.forEach(optionText => {
                             const option = document.createElement('option');
