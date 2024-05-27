@@ -1,4 +1,5 @@
-import osimport sys
+import os
+import sys
 import json
 
 root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
