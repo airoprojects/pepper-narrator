@@ -28,6 +28,7 @@ def send_info(client_socket, data):
     try:
         client_socket.sendall(data.encode('utf-8'))
         response = client_socket.recv(1024)
+        # if not response: client_socket.close()
         print("Received response:", response.decode('utf-8'))
         time.sleep(5)
     except Exception as e:
@@ -58,7 +59,10 @@ if __name__ == "__main__":
             print("game info: ", game_info)
             json_game_info = json.dumps(game_info)
             send_info(client_socket, json_game_info)
-        else: time.sleep(5)
+            response = client_socket.recv(1024)
+            print("Received response:", response.decode('utf-8'))
+        else: 
+            time.sleep(5)
 
         if memory.getData('state') == "end":  
             print("interrupting bridge connection!")
