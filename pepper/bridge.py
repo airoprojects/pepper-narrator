@@ -37,7 +37,7 @@ def send_info(client_socket, data):
 if __name__ == "__main__":
 
     # connection to python socket
-    ip_address = '192.168.1.213' # IP address of Machine 2
+    ip_address = '192.168.1.67' # IP address of Machine 2
     port = 65432 # generic
     client_socket = connect_to_socket(ip_address, port)
     

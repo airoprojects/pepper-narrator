@@ -1,9 +1,14 @@
 import os
 import re
+import sys
 import time
 import json
 import random
 import threading
+
+# add project root to sys path
+root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(root_dir)
 
 from utils import save_data_to_json
 

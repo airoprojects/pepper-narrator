@@ -1,9 +1,14 @@
+import os
+import qi
 import sys
 import time
 import random
-from copy import deepcopy
-import qi
 import argparse
+from copy import deepcopy
+
+# add project root to sys path
+root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(root_dir)
 
 from utils import load_data_from_json, save_data_to_json
 from pepper_functions import *        
