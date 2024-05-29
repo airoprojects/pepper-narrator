@@ -28,8 +28,8 @@ docker network create hri-net --subnet=192.168.1.0/8
 
 1. activate docker container
 ```
-systemctl start docker 
-docker start pepperhri  --net hri-net --ip 192.168.1.2
+cd docker 
+./run.bash
 docker exec -it pepperhri tmux a
 ```
 2. run choreograph in choreograph terminal
@@ -45,6 +45,16 @@ docker exec -it pepperhri tmux a
 ```
 cd pepper-narrator/pepper
 python main.py
+```
+6. run the web server
+```
+cd pepper-narrator/webserver
+python app.py
+```
+7. run the bridge between docker and the host machine
+```
+cd pepper-narrator/pepper
+python bridge.py
 ```
 
 
