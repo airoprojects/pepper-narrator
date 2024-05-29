@@ -6,9 +6,10 @@ import os
 import qi
 import sys
 import time
+import json
 import socket 
 import random
-import json
+import subprocess
 from copy import deepcopy
 
 
@@ -38,7 +39,10 @@ def send_info(client_socket, data):
 if __name__ == "__main__":
 
     # connection to python socket
-    ip_address = '192.168.60.17' #'192.168.1.67' # IP address of Machine 2
+    # local machine ip
+    result = result = subprocess.check_output("hostname -I | awk '{print $1}'", shell=True)
+    ip_address = result.strip()
+    print("local machine ip: ", ip_address)
     port = 65432 # generic
     client_socket = connect_to_socket(ip_address, port)
     
@@ -61,6 +65,7 @@ if __name__ == "__main__":
             send_info(client_socket, json_game_info)
             response = client_socket.recv(1024)
             print("Received response:", response.decode('utf-8'))
+            print("not allowing other responses!!!")
         else: 
             time.sleep(5)
 
