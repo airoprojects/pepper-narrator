@@ -8,8 +8,14 @@
 <body>
     <h1>Players List</h1>
     <div id="playersList"></div>
-    <script src="client.js"></script>
+    <!-- <script src="client.js"></script> -->
     <script>
+
+        // Function to update the page with new data
+        function updatePage(data) {
+            // Implement your logic to update the page with the fetched data
+            document.getElementById('gameInfo').textContent = JSON.stringify(data, null, 2);
+        }
 
         // fetch data from flask server
         // async function fetchData() {
@@ -23,6 +29,25 @@
         //         return 'inactive'; // Default to 'inactive' on error
         //     }
         // }
+
+        // Function to update the page with new data
+        // function updatePage(data) {
+        //     // Implement your logic to update the page with the fetched data
+        //     document.getElementById('gameInfo').textContent = JSON.stringify(data, null, 2);
+        // }
+
+        async function fetchData() {
+            // try {
+            const response = await fetch('http://192.168.60.17:5000/request_data');  // Flask server URL
+            const data = await response.json();
+            console.log(data);  // Logging the entire dictionary
+            // updatePage(data);
+            // } catch (error) {
+            //     console.error('Error fetching game info:', error);
+            //     updatePage('inactive');  // Default to 'inactive' on error
+            // }
+            return data
+        }
 
         function generatePlayerButtons(players) {
             const playersListDiv = document.getElementById('playersList');
