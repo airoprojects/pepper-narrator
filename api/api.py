@@ -138,8 +138,8 @@ app = Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
 
 # Ensure Redis URL is configured correctly
-app.config["REDIS_URL"] = "redis://localhost:6379"
-app.register_blueprint(sse, url_prefix='/stream')
+# app.config["REDIS_URL"] = "redis://localhost:6379"
+# app.register_blueprint(sse, url_prefix='/stream')
 
 # global variables
 game_info = {}  # Shared dictionary to store game info
@@ -250,6 +250,7 @@ def index():
     return send_from_directory('', 'select_players.html')
 
 if __name__ == '__main__':
-    socket_thread = Thread(target=listen, args=())
-    socket_thread.start()
-    app.run(debug=False, host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000)
+
+    # socket_thread = Thread(target=listen, args=())
+    # socket_thread.start()
