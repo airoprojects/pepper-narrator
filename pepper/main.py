@@ -7,10 +7,11 @@ import argparse
 from copy import deepcopy
 
 # add project root to sys path
-root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(root_dir)
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
+sys.path.append(parent_dir)
 
-from utils import load_data_from_json, save_data_to_json
+from utils.utils import load_data_from_json, save_data_to_json
 from pepper_functions import *        
 
 def main():

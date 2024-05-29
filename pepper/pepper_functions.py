@@ -7,10 +7,10 @@ import random
 import threading
 
 # add project root to sys path
-root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(root_dir)
-
-from utils import save_data_to_json
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
+sys.path.append(parent_dir)
+from utils.utils import save_data_to_json
 
 
 def recovery_game_handler(game_id, tts, memory, dialog, database, game_info):
