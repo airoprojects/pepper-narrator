@@ -125,7 +125,7 @@
 
 ##PROVA
 
-from flask import Flask, request, jsonify, Response, current_app
+from flask import Flask, request, jsonify, Response, send_from_directory
 from flask_cors import CORS
 from flask_sse import sse
 import socket
@@ -228,23 +228,28 @@ def submit_integer():
         print('errore:', e)
         return jsonify({"status": "error", "message": str(e)}), 400
 
-@app.route('/request_data')
+@app.route('/request_data',  methods=['GET'])
 def send_data():
     global game_info
     print(f"\nSending data: {game_info} to webpage")
     return jsonify(game_info)
 
-@app.route('/stream')
-def stream():
-    def event_stream():
-        pubsub = sse.pubsub()
-        pubsub.subscribe('game_update')
-        for message in pubsub.listen():
-            if message['type'] == 'message':
-                yield f"data: {message['data']}\n\n"
-    return Response(event_stream(), content_type='text/event-stream')
+# @app.route('/stream')
+# def stream():
+#     def event_stream():
+#         pubsub = sse.pubsub()
+#         pubsub.subscribe('game_update')
+#         for message in pubsub.listen():
+#             if message['type'] == 'message':
+#                 yield f"data: {message['data']}\n\n"
+#     return Response(event_stream(), content_type='text/event-stream')
+
+# Endpoint to serve the HTML file
+@app.route('../clients/')
+def index():
+    return send_from_directory('', 'select_players.html')
 
 if __name__ == '__main__':
     socket_thread = Thread(target=listen, args=())
     socket_thread.start()
-    app.run(debug=False, host='0.0.0.0')
+    app.run(debug=False, host='0.0.0.0', port=5000)
