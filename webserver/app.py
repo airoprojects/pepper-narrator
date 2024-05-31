@@ -1,23 +1,4 @@
-# from flask import Flask, jsonify, send_from_directory
-# import random
-
-# app = Flask(__name__)
-
-# # Endpoint to get the variable
-# @app.route('/api/variable', methods=['GET'])
-# def get_variable():
-#     variable = random.randint(1, 100)  # Generating a random number as an example
-#     return jsonify({'variable': variable})
-
-# # Endpoint to serve the HTML file
-# @app.route('/')
-# def index():
-#     return send_from_directory('', 'index.html')
-
-# if __name__ == '__main__':
-#     app.run(host='0.0.0.0', port=5000)
-
-from flask import Flask, request, jsonify, Response, send_from_directory
+from flask import Flask, request, jsonify, Response, send_from_directory, render_template
 from flask_cors import CORS
 from threading import Thread
 import time
@@ -29,7 +10,7 @@ import subprocess
 
 # Get the absolute path of the current project
 script_path = os.path.abspath(__file__)
-project_path = os.path.dirname(script_path) + '/../'
+project_path = os.path.dirname(script_path) + "/" # '/../'
 print(f"The directory containing this script is: {project_path}")
 
 # global variables
@@ -104,13 +85,13 @@ def send_data():
 # Endpoint to serve the HTML file
 @app.route('/')
 def index():
-    return send_from_directory(project_path + 'webpage/', 'select_player.html')
+    return render_template('select_player.html', host_ip=ip_address)
 
 
 # Endpoint to serve player.html
 @app.route('/player.html')
 def player():
-    return send_from_directory(project_path + 'webpage/', 'player.html')
+    return render_template('player.html', host_ip=ip_address)
 
 if __name__ == '__main__':
     

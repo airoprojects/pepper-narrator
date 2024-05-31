@@ -10,16 +10,10 @@
     <div id="playersList"></div>
     <!-- <script src="client.js"></script> -->
     <script>
-
-        // // Function to update the page with new data
-        // function updatePage(data) {
-        //     // Implement your logic to update the page with the fetched data
-        //     document.getElementById('gameInfo').textContent = JSON.stringify(data, null, 2);
-        // }
+        var host_ip = "{{ host_ip }}";
 
         async function fetchData() {
-            // try {
-            const response = await fetch('http://192.168.1.213:5000/request_data');  // Flask server URL
+            const response = await fetch('http://'+host_ip+':5000/request_data');  // Flask server URL
             const data = await response.json();
             console.log(data);  // Logging the entire dictionary
             return data
@@ -53,6 +47,8 @@
                 const welcome_text = document.getElementById('playersList');
                 welcome_text.innerHTML = ''; // Clear previous content
                 welcome_text.appendChild(document.createTextNode('Gratings peasants!!! \nWelcome to the joyful village of Tabula. \nThe sun is low and new exiting night is about to come! \nWhat will happen? \nYou are about to find out!'));
+                let curr_ip = location.host;
+                console.log(curr_ip)
             }
         }
 
