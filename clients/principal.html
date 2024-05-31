@@ -42,6 +42,22 @@
       </ul>
     </div>
 
+  
+    <button onclick="generateQRCode()">Generate QR Code</button>
+    <div id="qrcode"></div>
+    <input type="text" id="text-input" placeholder="Enter text to generate QR code">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+
+      ip = "http//"
+        function generateQRCode() {
+            var text = document.getElementById('text-input').value;
+            document.getElementById('qrcode').innerHTML = "";
+            new QRCode(document.getElementById("qrcode"), text);
+        }
+    </script>
+
+
 <input type="number" id="integerInput" placeholder="Enter an integer">
 <button onclick="sendInteger()">Send vote</button>
 
