@@ -19,6 +19,7 @@ player_vote = {}  # A dict that represents a votation on players; reset every vo
 num_votes = 0
 
 # Docker communication
+# TODO: get the local machine ip address with a more general method
 result = subprocess.run("hostname -I | awk '{print $1}'", shell=True, capture_output=True, text=True)
 ip_address = result.stdout.strip()
 print(f"local machine ip: {ip_address}")
