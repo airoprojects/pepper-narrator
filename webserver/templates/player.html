@@ -22,7 +22,7 @@
 
         // Function to send integer vote to the Flask server
         function sendInteger(vote_id) {
-            fetch('http://192.168.1.213:5000/submit_integer', {  // Flask server URL
+            fetch('http://'+host_ip+':5000/submit_integer', {  // Flask server URL
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
