@@ -56,7 +56,15 @@ if __name__ == "__main__":
     ip_address = result.strip()
     print("local machine ip: ", ip_address)
     port = 65432 # generic
-    client_socket = connect_to_socket(ip_address, port)
+    connected = False
+    while not connected:
+        try:
+            client_socket = connect_to_socket(ip_address, port)
+            connected = True
+        except Exception as e:
+            print("Not connected to socket, retrying...")
+            time.sleep(5)
+    print("CONNECTED to socket")
     
     # connection to naoqi robot
     robot_ip = '127.0.0.1' #'127.0.0.1'
