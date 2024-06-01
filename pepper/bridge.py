@@ -35,6 +35,18 @@ def send_info(client_socket, data):
     except Exception as e:
         client_socket.close() # to be on the safe side
         raise e
+    
+def votes_handler(response, game_state, game_info, memory):
+    if game_state == 'voting_night':
+        player_to_kill = int(max(response.items(), key=lambda item: item[1])[0])
+        memory.insertData('votes', player_to_kill)
+        print("player to kill: ", player_to_kill)
+        print("votes: ", response)
+    elif game_state == 'voting_day':
+        votes = [0]*len(game_info['players'])
+        for player, n_votes in response.items():
+            votes[int(player)] = n_votes
+        memory.insertData('votes', votes)
 
 if __name__ == "__main__":
 
@@ -53,13 +65,14 @@ if __name__ == "__main__":
     session.connect("tcp://{}:{}".format(robot_ip, robot_port))
     print("session: ", session)
     memory = session.service("ALMemory")
-    game_info = dict()
-
+    
+    game_state_prev = None
     while True:
-        game_info_update = format_dictionary_from_memory(memory.getData('game_info'))
+        game_state = memory.getData('game_state')
 
-        if game_info != game_info_update:
-            game_info = game_info_update
+        if game_state != game_state_prev:
+            game_info = format_dictionary_from_memory(memory.getData('game_info'))
+            print("game state: ", game_state)
             print("game info: ", game_info)
             json_game_info = json.dumps(game_info)
             send_info(client_socket, json_game_info)
@@ -67,19 +80,9 @@ if __name__ == "__main__":
             print("Received response:", response)
             print("not allowing other responses!!!")
             
-            # TODO understand why the response is not being detected
-            if(game_info['night']):
-                player_to_kill = max(response.items(), key=lambda item: item[1])[0]
-                print("Player to kill: ", player_to_kill)
-                memory.insertData('votes', player_to_kill)
-            else:
-                votes = [0]*len(game_info['players'])
-                for player, n_votes in response.items():
-                    votes[int(player)] = n_votes
-                memory.insertData('votes', votes)
-            
+            votes_handler(response, game_state, game_info, memory)
         else: 
-            time.sleep(5)
+            time.sleep(1)
 
         if memory.getData('state') == "end":  
             print("interrupting bridge connection!")
