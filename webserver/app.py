@@ -7,6 +7,7 @@ import json
 import os
 from api import API
 import subprocess
+import netifaces as ni
 
 # Get the absolute path of the current project
 script_path = os.path.abspath(__file__)
@@ -19,9 +20,7 @@ player_vote = {}  # A dict that represents a votation on players; reset every vo
 num_votes = 0
 
 # Docker communication
-# TODO: get the local machine ip address with a more general method
-result = subprocess.run("hostname -I | awk '{print $1}'", shell=True, capture_output=True, text=True)
-ip_address = result.stdout.strip()
+ip_address = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
 print(f"local machine ip: {ip_address}")
 docker_api = API(host=ip_address, game_info=game_info)
 
