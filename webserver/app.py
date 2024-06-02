@@ -82,16 +82,21 @@ def send_data():
     return jsonify(game_info)
 
 
-# Endpoint to serve the HTML file
-@app.route('/')
-def index():
-    return render_template('select_player.html', host_ip=ip_address)
 
+# Endpoint to serve player_select.html
+@app.route('/select_player.html')
+def select_player():
+    return render_template('select_player.html', host_ip=ip_address)
 
 # Endpoint to serve player.html
 @app.route('/player.html')
 def player():
     return render_template('player.html', host_ip=ip_address)
+
+# Endpoint to serve homepage
+@app.route('/')
+def index():
+    return render_template('homepage.html', host_ip=ip_address)
 
 if __name__ == '__main__':
     
@@ -99,3 +104,7 @@ if __name__ == '__main__':
     # docker_api.start_connection()
     app.run(host='0.0.0.0', port=5000)
     
+    
+    
+    
+# {% comment %}  {% endcomment %}

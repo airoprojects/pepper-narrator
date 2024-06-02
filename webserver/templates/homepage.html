@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lupus in Fabula</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='homepage.css') }}">
+
+</head>
+<body>
+    <h1>Lupus in Fabula</h1>
+    <h2>Scan the QR code to start the game</h2>
+    <div class="qrcode-container">
+        <div id="qrcode"></div>
+    </div>
+    <script>
+        let host_ip = "{{ host_ip }}";
+    </script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script type="module" src="{{ url_for('static', filename='homepage.js') }}"></script> 
+</body>
+</html>
