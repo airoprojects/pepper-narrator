@@ -78,7 +78,7 @@ def submit_integer():
 @app.route('/request_data')
 def send_data():
     global game_info
-    print(f"\nSending data: {game_info} to webpage")
+    # print(f"\nSending data: {game_info} to webpage")
     return jsonify(game_info)
 
 
@@ -104,7 +104,3 @@ if __name__ == '__main__':
     # docker_api.start_connection()
     app.run(host='0.0.0.0', port=5000)
     
-    
-    
-    
-# {% comment %}  {% endcomment %}
