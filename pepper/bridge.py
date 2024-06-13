@@ -76,7 +76,8 @@ if __name__ == "__main__":
     
     game_state_prev = None
     while True:
-        game_state = memory.getData('game_state')
+        game_state = memory.getData('game_state') # correct
+        print("Game state: {} ##################################".format(game_state))
 
         if game_state != game_state_prev:
             game_info = format_dictionary_from_memory(memory.getData('game_info'))
@@ -86,11 +87,12 @@ if __name__ == "__main__":
             send_info(client_socket, json_game_info)
             response = json.loads( client_socket.recv(1024).decode('utf-8') )
             print("Received response:", response)
-            print("not allowing other responses!!!")
-            
+            print("handling votes!!!")
             votes_handler(response, game_state, game_info, memory)
+            game_state_prev = game_state
         else: 
             time.sleep(1)
+            print("wating...")
 
         if memory.getData('state') == "end":  
             print("interrupting bridge connection!")

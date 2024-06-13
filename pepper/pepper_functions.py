@@ -161,13 +161,14 @@ def game(game_info, tts, memory, dialog, database, logger):
             print(player_to_kill, player_to_kill_name)
             print(game_info['alive'])
             
-        else:
+        else: # day
 
             # everyone can now vote
             for idx, alive in enumerate(game_info["alive"]):
                 if alive: game_info["vote"][idx] = True
             tts.say("Now you must decide who is responsible for this!")
-      
+
+            memory.insertData('game_info', game_info)
             majority = False
             while not majority:
                 memory.insertData('votes', None) 

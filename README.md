@@ -16,8 +16,9 @@ To explore some resources used/related to the project look here [resources](reso
 # tmp 
 ## TODO LIST
 
-- make a series of topics
-
+- [X] aggiornare il controllo sulle votazioni
+- [ ] aggiornare lo stato della pagina web (giorno/notte vivo/morto)
+- [ ]
 
 ### How to run a simulation simulation
 
