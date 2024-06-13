@@ -6,13 +6,13 @@ async function fetchData() {
 }
 
 // Function to send integer vote to the Flask server
-function sendInteger(vote_id) {
-    fetch('http://'+host_ip+':5000/submit_integer', {  // Flask server URL
+function sendVotation(vote_id, voter_id) {
+    fetch('http://'+host_ip+':5000/submit_votes', {  // Flask server URL
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ integer: vote_id })
+        body: JSON.stringify({ vote: vote_id, voter: voter_id})
     })
     .then(response => {
         console.log('response', response);
@@ -38,8 +38,8 @@ function getQueryParam(param) {
     return urlParams.get(param);
 }
 
-// Generate a list of player
-function generatePlayersList(players, playerId, alive) {
+// Generate a list of player to vote
+function generatePlayersList(players, playerId, alive, roles, night) {
     const playerList = document.getElementById('voting');
     if (!playerList) {
         console.error('Element with id "voting" not found');
@@ -51,15 +51,29 @@ function generatePlayersList(players, playerId, alive) {
     const select = document.createElement('select');
     select.name = 'playerVotes';
     select.id = 'playerVotes';
-
-    players.forEach((player, index) => {
-        if (index !== playerId && alive[index]) {
-            const option = document.createElement('option');
-            option.value = index;
-            option.text = player;
-            select.appendChild(option);
-        }
-    });
+    console.log('night: ', night)
+    if (night) {
+        players.forEach((player, index) => {
+            console.log('role', roles[index])
+            console.log(roles[index] !== 'wolf')
+            if (index !== playerId && alive[index] && roles[index] !== 'wolf') {
+                const option = document.createElement('option');
+                option.value = index;
+                option.text = player;
+                select.appendChild(option);
+            }
+        });
+    }
+    else {
+        players.forEach((player, index) => {
+            if (index !== playerId && alive[index]) {
+                const option = document.createElement('option');
+                option.value = index;
+                option.text = player;
+                select.appendChild(option);
+            }
+        });
+    }
     playerList.appendChild(select);
 
     // Log the initially selected value
@@ -71,12 +85,13 @@ function generatePlayersList(players, playerId, alive) {
     button.onclick = () => {
         const selectedValue = document.getElementById('playerVotes').value;
         console.log("Selected option value: ", selectedValue);
-        sendInteger(selectedValue);
+        sendVotation(selectedValue, playerId);
+        button.disabled = "disabled";
     };
     playerList.appendChild(button);
 }
 
-function showPlayer(playerId, players, vote, alive, roles) {
+function showPlayer(playerId, players, vote, alive, roles, night) {
     if (playerId) {
         console.log("show players info");
         console.log("players: ", players);
@@ -84,14 +99,16 @@ function showPlayer(playerId, players, vote, alive, roles) {
         console.log("vote: ", vote[playerId]);
         const player = players[playerId];
         const role = roles[playerId];
+        const player_alive = alive[playerId];
         if (player) {
             const playerInfoDiv = document.getElementById('playerInfo');
             playerInfoDiv.innerHTML = `
                 <p>Name: ${player}</p>
                 <p>Role: ${role}</p>
+                <p>Alive: ${player_alive}</p>
             `;
             if (vote[playerId]) {
-                generatePlayersList(players, playerId, alive);
+                generatePlayersList(players, playerId, alive, night);
             }
             
         } else {
@@ -113,8 +130,17 @@ async function updateState(){
     const vote = game_info.vote;
     const alive = game_info.alive;
     const roles = game_info.roles;
+    const night = game_info.night;
+    // Update background image based on night variable
+    const bodyElement = document.body;
+    if (night) {
+        bodyElement.style.backgroundImage = "url('static/backgrounds/wolf_dark_background.webp')";
+    } else {
+        bodyElement.style.backgroundImage = "url('static/backgrounds/artistic_background.webp')";
+    }
+    
     console.log("info:", game_info);
-    showPlayer(playerId, players, vote, alive, roles);
+    showPlayer(playerId, players, vote, alive, roles, night);
 }
 
 document.addEventListener('DOMContentLoaded', () => {

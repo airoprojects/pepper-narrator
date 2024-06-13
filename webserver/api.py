@@ -14,6 +14,7 @@ class API():
     self.game_info = game_info
     self.server_socket = self.make_socket(host, port)
     self.conn, self.addr = None, None
+    self.max_votes_allowed = 0
     
   def make_socket(self, host, port):
       server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -44,7 +45,8 @@ class API():
               print(f"\nReceived data: {data.decode('utf-8')} \n")
               new_data = json.loads(data.decode('utf-8'))
               self.update_game_info(new_data)
-              self.conn.sendall("Data received".encode('utf-8'))
+              self.max_votes_allowed = new_data["vote"].count(True)
+              self.conn.sendall("New game info received".encode('utf-8'))
       
   def update_game_info(self, new_data):
       self.game_info.clear()

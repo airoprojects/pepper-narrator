@@ -30,8 +30,8 @@ app = Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
 
 # service to get data from the webpage
-@app.route('/submit_integer', methods=['POST'])
-def submit_integer():
+@app.route('/submit_votes', methods=['POST'])
+def submit_votes():
     global docker_api
     global num_votes
     global player_vote
@@ -42,20 +42,25 @@ def submit_integer():
         if data is None:
             raise ValueError("No JSON data received")
 
-        integer_value = data.get('integer', None)
-        integer_value = int(integer_value)
+        vote_id = data.get('vote', None)
+        vote_id = int(vote_id)
 
-        print("integer_value  ", integer_value)
+        voter_id = data.get('voter', None)
+        voter_id = int(voter_id)
+        game_info['vote'][voter_id] = False
+
+        print("integer_value  ", vote_id)
         print("player_vote before ", player_vote)
-        if integer_value not in player_vote.keys(): player_vote[integer_value] = 1
-        else: player_vote[integer_value] += 1
+        if vote_id not in player_vote.keys(): player_vote[vote_id] = 1
+        else: player_vote[vote_id] += 1
 
         print(f"player_vote after: {player_vote}")
         num_votes += 1 
         print(f"number of votes: {num_votes}")
 
-        print("max votes allowed: ", game_info["vote"].count(True))
-        if num_votes == (game_info["vote"].count(True)):
+        print("max votes allowed: ", docker_api.max_votes_allowed)
+        if num_votes == docker_api.max_votes_allowed:
+        #(game_info["vote"].count(True)):
             docker_api.send_back(player_vote)
             # reset voting
             num_votes = 0
@@ -63,12 +68,12 @@ def submit_integer():
             print(f"reset num votes: {num_votes}")
             print(f"reset votes dictionary: {player_vote}")
 
-        if integer_value is None or not isinstance(integer_value, int):
+        if vote_id is None or not isinstance(vote_id, int):
             raise ValueError("Invalid or missing integer")
 
         # Process the integer value as needed
-        print(f"Received integer: {integer_value}")
-        return jsonify({"status": "success", "integer": integer_value}), 200
+        print(f"Received integer: {vote_id}")
+        return jsonify({"status": "success", "integer": vote_id}), 200
     
     except Exception as e:
         print('catched error:', e)
@@ -81,7 +86,6 @@ def send_data():
     global game_info
     # print(f"\nSending data: {game_info} to webpage")
     return jsonify(game_info)
-
 
 
 # Endpoint to serve player_select.html
