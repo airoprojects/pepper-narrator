@@ -20,7 +20,8 @@ player_vote = {}  # A dict that represents a votation on players; reset every vo
 num_votes = 0
 
 # Docker communication
-ip_address = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
+interface_name = ni.interfaces()[1]
+ip_address = ni.ifaddresses(interface_name)[ni.AF_INET][0]['addr']
 print(f"local machine ip: {ip_address}")
 docker_api = API(host=ip_address, game_info=game_info)
 
