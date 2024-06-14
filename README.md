@@ -17,8 +17,8 @@ To explore some resources used/related to the project look here [resources](reso
 ## TODO LIST
 
 - [X] aggiornare il controllo sulle votazioni
-- [ ] aggiornare lo stato della pagina web (giorno/notte vivo/morto)
-- [ ]
+- [X] aggiornare lo stato della pagina web (giorno/notte vivo/morto)
+- [ ] fix bug i lupi compaiono nella lista di giocatori da votare nella notte
 
 ### How to run a simulation simulation
 

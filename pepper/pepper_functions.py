@@ -170,13 +170,14 @@ def game(game_info, tts, memory, dialog, database, logger):
 
             memory.insertData('game_info', game_info)
             majority = False
+            round = 0
             while not majority:
+                round += 1
                 memory.insertData('votes', None) 
                 memory.insertData("game_state", "voting_day") # for server callback
                 players_votes = get_votation(memory) # suppose that this list is complete !!!             
                 max_votes = max(players_votes)
                 print(max_votes, players_votes)
-                
                 if players_votes.count( max_votes ) > 1:
                     print("again")
                     tts.say("Please vote again. You must be more united in your choice.")
@@ -187,6 +188,7 @@ def game(game_info, tts, memory, dialog, database, logger):
                     # disable voting for tie players
                     for id in tie_players:
                         game_info['vote'][id] = False
+                    memory.insertData("game_state", "voting_day_"+str(round))
                 else:
                     majority = True
                     player_to_kill = players_votes.index(max_votes) 
