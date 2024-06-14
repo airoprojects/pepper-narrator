@@ -23,7 +23,7 @@ function sendVotation(vote_id, voter_id) {
     })
     .then(data => {
         console.log('Success:', data);
-        alert(`Server response: ${data.status}`);
+        // alert(`Server response: ${data.status}`);
     })
     .catch((error) => {
         console.error('Error:', error);
@@ -54,9 +54,8 @@ function generatePlayersList(players, playerId, alive, roles, night) {
     console.log('night: ', night)
     if (night) {
         players.forEach((player, index) => {
-            console.log('role', roles[index])
-            console.log(roles[index] !== 'wolf')
-            if (index !== playerId && alive[index] && roles[index] !== 'wolf') {
+            if (index != playerId && alive[index] && roles[index] != 'wolf') {
+                console.log('role', roles[index])
                 const option = document.createElement('option');
                 option.value = index;
                 option.text = player;
@@ -66,7 +65,7 @@ function generatePlayersList(players, playerId, alive, roles, night) {
     }
     else {
         players.forEach((player, index) => {
-            if (index !== playerId && alive[index]) {
+            if (index != playerId && alive[index]) {
                 const option = document.createElement('option');
                 option.value = index;
                 option.text = player;
@@ -97,6 +96,7 @@ function showPlayer(playerId, players, vote, alive, roles, night) {
         console.log("players: ", players);
         console.log("player id: ", playerId);
         console.log("vote: ", vote[playerId]);
+        console.log("night inside: ", night);
         const player = players[playerId];
         const role = roles[playerId];
         const player_alive = alive[playerId];
@@ -108,7 +108,7 @@ function showPlayer(playerId, players, vote, alive, roles, night) {
                 <p>Alive: ${player_alive}</p>
             `;
             if (vote[playerId]) {
-                generatePlayersList(players, playerId, alive, night);
+                generatePlayersList(players, playerId, alive, roles, night);
             }
             
         } else {
@@ -117,7 +117,6 @@ function showPlayer(playerId, players, vote, alive, roles, night) {
     } else {
         document.getElementById('playerInfo').textContent = 'No player selected.';
     }
-
     
 }
 
@@ -131,6 +130,7 @@ async function updateState(){
     const alive = game_info.alive;
     const roles = game_info.roles;
     const night = game_info.night;
+    console.log('night outside', night)
     // Update background image based on night variable
     const bodyElement = document.body;
     if (night) {
