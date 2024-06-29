@@ -40,3 +40,4 @@ proposal: %end_init_new Game starting! $state="ready_new"
 proposal: %end_init_old The show must go on! $state="ready_old"
 
 u: (~stop) %end Damn! $onStopped=1 $state="end" 
+
