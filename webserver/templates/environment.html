@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Environment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>ENVIRONMENT</h1>
+    <div id="buttons_eyes_opened">
+        
+    </div>
+    <div id="env_events">
+        
+    </div>
+
+    <script>
+        let host_ip = "{{ host_ip }}";
+    </script>
+    
+    <script type="module" src="{{ url_for('static', filename='environment.js') }}"></script> 
+</body>
+
+</html>
