@@ -88,6 +88,11 @@ def send_data():
     return jsonify(game_info)
 
 
+# Endpoint to serve environment.html
+@app.route('/environment.html')
+def environment():
+    return render_template('environment.html', host_ip=ip_address)
+
 # Endpoint to serve player_select.html
 @app.route('/select_player.html')
 def select_player():
