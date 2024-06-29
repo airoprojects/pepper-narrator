@@ -5,6 +5,8 @@ import time
 import random
 import argparse
 from copy import deepcopy
+from functools import partial
+
 
 # add project root to sys path
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -18,6 +20,8 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-p','--port', type=str, help="Insert pepper port")
+    # parser.add_argument('--reset', action='store_true', help="Reset memory before starting")
+
     args = parser.parse_args()
 
     robot_ip = '127.0.0.1'
@@ -32,6 +36,9 @@ def main():
     
     dialog = session.service("ALDialog")
     dialog.setLanguage('English')
+
+    # reset memory before start
+    reset_memory(memory)
     
     database_filename = "../data/database.json"
     memory.insertData("database_filename", database_filename)
@@ -39,15 +46,35 @@ def main():
     database = load_data_from_json(database_filename)
     memory.insertData("state", "initialization")
     # game_info = initialize_game(tts, memory, dialog, database, logger)
-    game_info = deepcopy(database["games"]["1"])
+    game_info = deepcopy(database["games"]["1"]) 
     if memory.getData("state") == "end": return None
     
     tts.say("Starting...")
     memory.insertData("state", "game_loop")
     game(game_info, tts, memory, dialog, database, logger)
     # save_data_to_json(database_filename, database)
+
     
     return 0
+
+
+
+
+def reset_memory(memory):
+    keys_to_remove = ["database_filename", "state"]  # Aggiungi tutte le chiavi che vuoi resettare qui
+    for key in keys_to_remove:
+        try:
+            memory.removeData(key)
+            print("Removed key:")
+            print(key)
+        except Exception as e:
+            print("coult not remove key:")
+            print(key)
+            print("error:")
+            print(e)
+    print("Memory reset completed.")
+
+
     
     
 if __name__ == "__main__":

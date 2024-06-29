@@ -5,6 +5,8 @@ import time
 import json
 import random
 import threading
+from functools import partial
+
 
 # add project root to sys path
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -31,6 +33,7 @@ def recovery_game_handler(game_id, tts, memory, dialog, database, game_info):
     
 
 def new_player_handler(last_player_name, tts, memory, dialog, database, max_players, game_info):
+
     if(last_player_name in game_info['players']):
         tts.say(last_player_name + ", you are already registered.")
         dialog.gotoTag("name", "game_initialization")
@@ -44,6 +47,7 @@ def new_player_handler(last_player_name, tts, memory, dialog, database, max_play
         database['players'][last_player_name] = {}
         database['players'][last_player_name]['games'] = 1
         database['players'][last_player_name]['victories'] = 0
+        database['players'][last_player_name]['genre'] = random.choice(['Male','Female'])
     
     game_info['players'].append(last_player_name)
     
@@ -86,7 +90,7 @@ def initialize_game(tts, memory, dialog, database, logger, max_players=8):
         "vote": [],
     }
     
-    subscriber_name = memory.subscriber("last_player_name")
+    subscriber_name = memory.subscriber("last_player_name") 
     connection_name = subscriber_name.signal.connect(lambda name: new_player_handler(name, tts, memory, dialog, database, max_players, game_info))
     subscriber_recovery = memory.subscriber("recovered_game_id")
     connection_recovery = subscriber_recovery.signal.connect(lambda name: recovery_game_handler(name, tts, memory, dialog, database, game_info))
@@ -110,9 +114,19 @@ def initialize_game(tts, memory, dialog, database, logger, max_players=8):
     return game_info
 
 
-def get_votation(memory):
-    while memory.getData('votes') == None: time.sleep(0.5)
+def get_votation(memory, tts):
+    warning = True
+    while memory.getData('votes') == None: 
+        if (memory.getData('violence') == 'true' and warning):
+            tts.say("ve ne passate sempre. Bastardi figli di puttana")   
+            warning = False   
+        time.sleep(0.5)
     return memory.getData('votes')
+
+
+def violence_handler(a, tts, memory, dialog, database, game_info):
+    if(a == 'ciao'): 
+        tts.say("ve ne passate sempre. Bastardi figli di puttana")    
 
 
 def game(game_info, tts, memory, dialog, database, logger):
@@ -121,11 +135,20 @@ def game(game_info, tts, memory, dialog, database, logger):
     dialog.activateTopic(topic_name)
     dialog.subscribe('game_loop')
     winning_team = None
+
+    # print('v out:',  memory.getData('violence'))
+
+    # memory.insertData('violence', False)
     
     print(game_info['players'])
     print(game_info['roles'])
+
+    # subscriber_violence = memory.subscriber('violence')
+    # connection_violence = subscriber_violence.signal.connect(lambda a: violence_handler(a, tts, memory, dialog, database, game_info))
     
     while memory.getData("state") == "game_loop":
+        time.sleep(0.5)
+        # print('v:',  memory.getData('violence'))
         game_info['round'] += 1
         memory.insertData('game_info', game_info)
         # TODO: send to socket
@@ -147,7 +170,7 @@ def game(game_info, tts, memory, dialog, database, logger):
             print("changed game state")
             print(game_info['vote'])
             
-            player_to_kill = get_votation(memory)
+            player_to_kill = get_votation(memory, tts)
             
             game_info['alive'][player_to_kill] = False
             player_to_kill_name =  game_info['players'][player_to_kill]
@@ -242,4 +265,17 @@ def game(game_info, tts, memory, dialog, database, logger):
     dialog.unsubscribe('game_loop')
     dialog.deactivateTopic(topic_name)
     dialog.unloadTopic(topic_name)
-    
+
+    subscriber_violence.signal.disconnect(connection_violence)
+
+
+
+
+
+# PROVA
+
+
+
+
+
+

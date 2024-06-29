@@ -7,6 +7,7 @@ concept: (continue) [old continue "past one" cache]
 concept: (yes) [yes y si yep]
 concept: (no) [no n nope]
 concept: (stop) [stop basta pause]
+concept: (violence) [violence]
 
 # Catching inputs and triggering outputs
 # u:(e:onStart) $onStopped=1 
@@ -18,3 +19,5 @@ u:(~stop) Ok, do you want to save the game? $state=paused
 proposal: %end_save Game Saved! $onStopped=1 $state=end
 proposal: %end_no_save Exit without saving $onStopped=1 $state=end
 proposal: %end Game Ended! $onStopped=1 $state=end
+
+u: (~violence) %violence You choose violence
