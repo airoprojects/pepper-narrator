@@ -72,6 +72,22 @@ def assign_roles(players):
     return roles
 
 
+def explain_game(tts, dialog, memory):
+    print('chatgpt help us')
+    tts.say("test spiegazione")
+    # tts.say("""
+    #         In Lupus in Tabula, each player is secretly assigned a role, such as a Werewolf, Villager, or a special character like the Seer or Witch. I will be the non-playing moderator, overseeing the game to ensure the rules are followed and guiding the narrative. \\
+
+    #         The game is divided into two phases: night and day. During the night phase, the Werewolves secretly choose a victim to eliminate, while special characters, like the Seer who can identify a player's role, may use their unique abilities.
+
+    #         When the day phase begins, everyone discusses who they think the werewolves are. You all will vote, and the player with the most votes will be lynched, revealing their role. This cycle continues, with players being eliminated and revealing their roles, until one side wins. The Werewolves win by reducing the number of villagers to equal their own, while the villagers win by identifying and eliminating all the werewolves.
+
+    #         As the narrator, I'll oversee the game, making sure everything runs smoothly and providing the necessary prompts and narrative to keep the game engaging. The game is heavily based on discussion, bluffing, and deduction, so be ready for a mix of strategy and social interaction. Special roles like the Seer and Witch will add unique twists that can influence the game's outcome. We'll continue alternating between night and day phases until either the werewolves or villagers achieve their win condition.
+    #         """)
+    memory.insertData("state", "initialization")
+    dialog.gotoTag("selection", "game_initialization")
+
+
 def initialize_game(tts, memory, dialog, database, logger, max_players=8):
     game_initialization_topic =  '/home/robot/playground/pepper-narrator/pepper/topics/game_initialization.top'
     topic_name = dialog.loadTopic(game_initialization_topic)
@@ -96,6 +112,7 @@ def initialize_game(tts, memory, dialog, database, logger, max_players=8):
     connection_recovery = subscriber_recovery.signal.connect(lambda name: recovery_game_handler(name, tts, memory, dialog, database, game_info))
     
     while memory.getData("state") not in ["ready_new", "ready_old", "end"]:
+        if memory.getData("state") == 'explain': explain_game(tts, dialog, memory)
         time.sleep(0.5)
     
     # cleaning ALDialog connection and deactivating initialization topic        
@@ -119,10 +136,12 @@ def get_votation(memory, tts, warnings):
         if (memory.getData('violence') == 'true' and warnings <= 3 ):
             tts.say("ve ne passate sempre. Bastardi figli di puttana")   
             memory.insertData('violence', 'false')
+            # TODO: do some animations 
             warnings += 1
             if warnings >= 3 : 
                 tts.say("mo avete rotto il cazzo! tornate quando ve siete clamati, ve saluto") 
                 memory.insertData("game_state", "save")
+                # TODO: do some animations 
                 break
 
         if (memory.getData('time') == 'true'):
@@ -130,6 +149,7 @@ def get_votation(memory, tts, warnings):
             tts.say(late_players + " ve dovete sbriga!!!")  
             memory.insertData('time', 'false')
             memory.insertData('late_players', '')
+            # TODO: do some animations 
             
         time.sleep(0.5)
     return memory.getData('votes')
