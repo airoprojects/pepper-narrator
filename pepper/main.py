@@ -13,7 +13,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
 sys.path.append(parent_dir)
 
-from utils.utils import load_data_from_json, save_data_to_json
+from utils.utils import load_data_from_json, save_data_to_json, reset_memory
 from pepper_functions import *        
 
 def main():
@@ -36,6 +36,9 @@ def main():
     
     dialog = session.service("ALDialog")
     dialog.setLanguage('English')
+    
+    # animation_player_service = session.service("ALAnimationPlayer")
+    # animation_player_service.run("/opt/Aldebaran/choregraphe-suite-2.5.10.7-linux64/share/choregraphe/libraries/box/Animation/Entertainment/Dances/Pepper/Disco/box")
 
     # reset memory before start
     reset_memory(memory)
@@ -59,20 +62,6 @@ def main():
 
 
 
-
-def reset_memory(memory):
-    keys_to_remove = ["database_filename", "state"]  # Aggiungi tutte le chiavi che vuoi resettare qui
-    for key in keys_to_remove:
-        try:
-            memory.removeData(key)
-            print("Removed key:")
-            print(key)
-        except Exception as e:
-            print("coult not remove key:")
-            print(key)
-            print("error:")
-            print(e)
-    print("Memory reset completed.")
 
 
     

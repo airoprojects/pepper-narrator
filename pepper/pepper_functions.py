@@ -114,12 +114,23 @@ def initialize_game(tts, memory, dialog, database, logger, max_players=8):
     return game_info
 
 
-def get_votation(memory, tts):
-    warning = True
+def get_votation(memory, tts, warnings):
     while memory.getData('votes') == None: 
-        if (memory.getData('violence') == 'true' and warning):
+        if (memory.getData('violence') == 'true' and warnings <= 3 ):
             tts.say("ve ne passate sempre. Bastardi figli di puttana")   
-            warning = False   
+            memory.insertData('violence', 'false')
+            warnings += 1
+            if warnings >= 3 : 
+                tts.say("mo avete rotto il cazzo! tornate quando ve siete clamati, ve saluto") 
+                memory.insertData("game_state", "save")
+                break
+
+        if (memory.getData('time') == 'true'):
+            late_players = memory.getData('late_players')
+            tts.say(late_players + " ve dovete sbriga!!!")  
+            memory.insertData('time', 'false')
+            memory.insertData('late_players', '')
+            
         time.sleep(0.5)
     return memory.getData('votes')
 
@@ -135,11 +146,13 @@ def game(game_info, tts, memory, dialog, database, logger):
     dialog.activateTopic(topic_name)
     dialog.subscribe('game_loop')
     winning_team = None
-
-    # print('v out:',  memory.getData('violence'))
-
-    # memory.insertData('violence', False)
+    warnings = 0
     
+    # env initializations
+    memory.insertData('violence', 'false')
+    memory.insertData('time', 'false')
+    memory.insertData('opened_eyes', 'false')
+
     print(game_info['players'])
     print(game_info['roles'])
 
@@ -170,7 +183,8 @@ def game(game_info, tts, memory, dialog, database, logger):
             print("changed game state")
             print(game_info['vote'])
             
-            player_to_kill = get_votation(memory, tts)
+            player_to_kill = get_votation(memory, tts, warnings)
+            if player_to_kill == None: break
             
             game_info['alive'][player_to_kill] = False
             player_to_kill_name =  game_info['players'][player_to_kill]
@@ -198,7 +212,8 @@ def game(game_info, tts, memory, dialog, database, logger):
                 round += 1
                 memory.insertData('votes', None) 
                 memory.insertData("game_state", "voting_day") # for server callback
-                players_votes = get_votation(memory) # suppose that this list is complete !!!             
+                players_votes = get_votation(memory, tts, warnings) # suppose that this list is complete !!!         
+                if players_votes == None: break    
                 max_votes = max(players_votes)
                 print(max_votes, players_votes)
                 if players_votes.count( max_votes ) > 1:
@@ -265,14 +280,6 @@ def game(game_info, tts, memory, dialog, database, logger):
     dialog.unsubscribe('game_loop')
     dialog.deactivateTopic(topic_name)
     dialog.unloadTopic(topic_name)
-
-    subscriber_violence.signal.disconnect(connection_violence)
-
-
-
-
-
-# PROVA
 
 
 
