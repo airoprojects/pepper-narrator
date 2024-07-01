@@ -54,10 +54,6 @@ while(True):
  
 # TODO:
 # """
-#     Easy:
-#     1. il gioco diverge perche diventa offesivo
-#     2. un utente che non vota in un tempo limite
-#     3. pepper spega le regole del gioco
 
 #     Medium:
 #     1. prendere per il culo quello che e' stato votato piu spesso

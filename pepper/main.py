@@ -48,8 +48,8 @@ def main():
     
     database = load_data_from_json(database_filename)
     memory.insertData("state", "initialization")
-    # game_info = initialize_game(tts, memory, dialog, database, logger)
-    game_info = deepcopy(database["games"]["1"]) 
+    game_info = initialize_game(tts, memory, dialog, database, logger)
+    # game_info = deepcopy(database["games"]["1"]) 
     if memory.getData("state") == "end": return None
     
     tts.say("Starting...")

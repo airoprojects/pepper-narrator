@@ -7,6 +7,7 @@ concept: (continue) [old continue "past one" cache]
 concept: (yes) [yes y si yep ok]
 concept: (no) [no n nope]
 concept: (stop) [stop basta pause]
+concept: (rules) [rules spiega regole] 
 
 # Catching inputs and triggering outputs
 # u:(e:onStart) $onStopped=1 
@@ -17,6 +18,7 @@ proposal: %selection Do you wanna start a new game or you want to continue a pas
     u1:(~new) %newGame Great! Are you ready to judge and betray your brothers? Please take a seat and tell me your names one at a time. $next_player_id=1 ^goto(name)
     u1:(~continue) What's the game id?
         u2: (_*) $recovered_game_id=$1
+    u1:(~rules) $state="explain" 
     u1:([nothing ~no]) ^goto(end)
 
 proposal: %endedGameId Why don't you start a new game?
