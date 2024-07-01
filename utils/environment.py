@@ -32,16 +32,39 @@ logger = qi.logging.Logger("game")
 print('v:(sopra riga 34)',  memory.getData('violence')) # reset the memory
 # insert enviroment situation in pepper
 memory.insertData('violence', 'false')
-# memory.insertData('opened_eyes', False)
+memory.insertData('opened_eyes', 'false')
 
 while(True):
     event = raw_input('Trigger event:')
-    if(event == 'violence'): 
-        print('v:',  memory.getData('violence'))
-        memory.insertData('violence', 'true')
-        print('v post:',  memory.getData('violence'))
-    if(event == 'opened_eyes'): memory.insertData('opened_eyes', True)
+    if(event == 'violence'): memory.insertData('violence', 'true')
+    if(event == 'time'): 
+        late_players = raw_input('late players: ')
+        memory.insertData('time', 'true')
+        memory.insertData('late_players', late_players)
+        print(late_players)
+    if(event == 'opened_eyes'): 
+        
+        memory.insertData('opened_eyes', 'true')
+
+
         
 
 
+
  
+# TODO:
+# """
+#     Easy:
+#     1. il gioco diverge perche diventa offesivo
+#     2. un utente che non vota in un tempo limite
+#     3. pepper spega le regole del gioco
+
+#     Medium:
+#     1. prendere per il culo quello che e' stato votato piu spesso
+
+#     Hard:
+#     1. un giocatore apre gli occhi
+#     2. un utente che colpisce una categoria particolare di persone
+#     3. un utente se ne va
+
+# """
