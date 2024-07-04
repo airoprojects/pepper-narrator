@@ -33,13 +33,11 @@ def main():
     tts.setParameter("speed", 400)
     memory = session.service("ALMemory")
     logger = qi.logging.Logger("game")
+    motion = session.service("ALMotion")
     
     dialog = session.service("ALDialog")
     dialog.setLanguage('English')
     
-    # animation_player_service = session.service("ALAnimationPlayer")
-    # animation_player_service.run("/opt/Aldebaran/choregraphe-suite-2.5.10.7-linux64/share/choregraphe/libraries/box/Animation/Entertainment/Dances/Pepper/Disco/box")
-
     # reset memory before start
     reset_memory(memory)
     
@@ -48,21 +46,17 @@ def main():
     
     database = load_data_from_json(database_filename)
     memory.insertData("state", "initialization")
-    game_info = initialize_game(tts, memory, dialog, database, logger)
+    game_info = initialize_game(tts, memory, dialog, database, logger, motion)
     # game_info = deepcopy(database["games"]["1"]) 
     if memory.getData("state") == "end": return None
     
     tts.say("Starting...")
     memory.insertData("state", "game_loop")
-    game(game_info, tts, memory, dialog, database, logger)
+    game(game_info, tts, memory, dialog, database, logger, motion)
     # save_data_to_json(database_filename, database)
 
     
-    return 0
-
-
-
-
+    return 0 
 
     
     
