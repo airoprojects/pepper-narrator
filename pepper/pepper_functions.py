@@ -7,6 +7,8 @@ import random
 import threading
 from functools import partial
 
+import animations
+
 
 # add project root to sys path
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -88,7 +90,7 @@ def explain_game(tts, dialog, memory):
     dialog.gotoTag("selection", "game_initialization")
 
 
-def initialize_game(tts, memory, dialog, database, logger, max_players=8):
+def initialize_game(tts, memory, dialog, database, logger, motion, max_players=8):
     game_initialization_topic =  '/home/robot/playground/pepper-narrator/pepper/topics/game_initialization.top'
     topic_name = dialog.loadTopic(game_initialization_topic)
     dialog.activateTopic(topic_name)
@@ -131,17 +133,21 @@ def initialize_game(tts, memory, dialog, database, logger, max_players=8):
     return game_info
 
 
-def get_votation(memory, tts, warnings):
+def get_votation(memory, tts, warnings, motion):
     while memory.getData('votes') == None: 
         if (memory.getData('violence') == 'true' and warnings <= 3 ):
             tts.say("ve ne passate sempre. Bastardi figli di puttana")   
             memory.insertData('violence', 'false')
-            # TODO: do some animations 
+            animations.calm_down(motion) 
+            animations.start_pose(motion)
             warnings += 1
             if warnings >= 3 : 
                 tts.say("mo avete rotto il cazzo! tornate quando ve siete clamati, ve saluto") 
                 memory.insertData("game_state", "save")
-                # TODO: do some animations 
+                animations.head_no(motion)
+                animations.start_pose(motion)
+                animations.hello(motion)
+                animations.start_pose(motion)
                 break
 
         if (memory.getData('time') == 'true'):
@@ -160,7 +166,7 @@ def violence_handler(a, tts, memory, dialog, database, game_info):
         tts.say("ve ne passate sempre. Bastardi figli di puttana")    
 
 
-def game(game_info, tts, memory, dialog, database, logger):
+def game(game_info, tts, memory, dialog, database, logger, motion):
     game_initialization_topic =  '/home/robot/playground/pepper-narrator/pepper/topics/game_loop.top'
     topic_name = dialog.loadTopic(game_initialization_topic)
     dialog.activateTopic(topic_name)
@@ -203,7 +209,7 @@ def game(game_info, tts, memory, dialog, database, logger):
             print("changed game state")
             print(game_info['vote'])
             
-            player_to_kill = get_votation(memory, tts, warnings)
+            player_to_kill = get_votation(memory, tts, warnings, motion)
             if player_to_kill == None: break
             
             game_info['alive'][player_to_kill] = False
@@ -232,7 +238,7 @@ def game(game_info, tts, memory, dialog, database, logger):
                 round += 1
                 memory.insertData('votes', None) 
                 memory.insertData("game_state", "voting_day") # for server callback
-                players_votes = get_votation(memory, tts, warnings) # suppose that this list is complete !!!         
+                players_votes = get_votation(memory, tts, warnings, motion) # suppose that this list is complete !!!         
                 if players_votes == None: break    
                 max_votes = max(players_votes)
                 print(max_votes, players_votes)
