@@ -106,13 +106,13 @@ def initialize_game(tts, memory, dialog, database, logger, motion, max_players=8
         "roles": [],
         "alive": [],
         "vote": [],
+        "hist": [],
     }
     
     subscriber_name = memory.subscriber("last_player_name") 
     connection_name = subscriber_name.signal.connect(lambda name: new_player_handler(name, tts, memory, dialog, database, max_players, game_info))
     subscriber_recovery = memory.subscriber("recovered_game_id")
     connection_recovery = subscriber_recovery.signal.connect(lambda name: recovery_game_handler(name, tts, memory, dialog, database, game_info))
-    
     while memory.getData("state") not in ["ready_new", "ready_old", "end"]:
         if memory.getData("state") == 'explain': explain_game(tts, dialog, memory)
         time.sleep(0.5)
@@ -133,7 +133,7 @@ def initialize_game(tts, memory, dialog, database, logger, motion, max_players=8
     return game_info
 
 
-def get_votation(memory, tts, warnings, motion):
+def get_votation(memory, tts, warnings, motion, game_info):
     while memory.getData('votes') == None: 
         if (memory.getData('violence') == 'true' and warnings <= 3 ):
             tts.say("ve ne passate sempre. Bastardi figli di puttana")   
@@ -156,6 +156,11 @@ def get_votation(memory, tts, warnings, motion):
             memory.insertData('time', 'false')
             memory.insertData('late_players', '')
             # TODO: do some animations 
+
+        if (memory.getData('joke') == 'true' and game_info['hist'] != []):
+            max_index = game_info['hist'].index(max(game_info['hist']))
+            player_name = game_info['players'][max_index]
+            tts.say("senti un po' "+ player_name + " ma com'e' non se fida nessuno di te, che hai combinato?")
             
         time.sleep(0.5)
     return memory.getData('votes')
@@ -177,6 +182,7 @@ def game(game_info, tts, memory, dialog, database, logger, motion):
     # env initializations
     memory.insertData('violence', 'false')
     memory.insertData('time', 'false')
+    memory.insertData('joke', 'false')
     memory.insertData('opened_eyes', 'false')
 
     print(game_info['players'])
@@ -189,14 +195,13 @@ def game(game_info, tts, memory, dialog, database, logger, motion):
         time.sleep(0.5)
         # print('v:',  memory.getData('violence'))
         game_info['round'] += 1
-        memory.insertData('game_info', game_info)
         # TODO: send to socket
+        memory.insertData('game_info', game_info)
         print("Round {}, {}".format(game_info['round'], "night" if game_info['night'] else "day"))
         
         if game_info['night']:
             tts.say("It is night, close your eyes.")
             memory.insertData('votes', None) 
-            memory.insertData("game_state", "voting_night") # for server callback
 
             # wolves can now vote
             for idx, value in enumerate(zip(game_info["roles"], game_info["alive"])):
@@ -207,9 +212,10 @@ def game(game_info, tts, memory, dialog, database, logger, motion):
             # uptate game info to tell web page who can vote
             memory.insertData('game_info', game_info)
             print("changed game state")
-            print(game_info['vote'])
+            print("who can vote: ", game_info["vote"])
+            memory.insertData("game_state", "voting_night") # for server callback
             
-            player_to_kill = get_votation(memory, tts, warnings, motion)
+            player_to_kill = get_votation(memory, tts, warnings, motion, game_info)
             if player_to_kill == None: break
             
             game_info['alive'][player_to_kill] = False
@@ -238,10 +244,19 @@ def game(game_info, tts, memory, dialog, database, logger, motion):
                 round += 1
                 memory.insertData('votes', None) 
                 memory.insertData("game_state", "voting_day") # for server callback
-                players_votes = get_votation(memory, tts, warnings, motion) # suppose that this list is complete !!!         
+
+                players_votes = get_votation(memory, tts, warnings, motion, game_info) # suppose that this list is complete !!!  
+                print("INFO players votes: ", players_votes) 
+
+                # make a function for this
+                if game_info['hist'] == [] : game_info['hist'] = players_votes
+                else: game_info['hist'] = [x + y for x, y in zip(game_info['hist'], players_votes)]
+
+                print("INFO: ", game_info['hist'])
                 if players_votes == None: break    
                 max_votes = max(players_votes)
                 print(max_votes, players_votes)
+
                 if players_votes.count( max_votes ) > 1:
                     print("again")
                     tts.say("Please vote again. You must be more united in your choice.")
@@ -278,6 +293,7 @@ def game(game_info, tts, memory, dialog, database, logger, motion):
             tts.say("Villagers win")
             memory.insertData("game_state", "end")
             memory.insertData("winning_team", winning_team)
+
         elif alive_wolves >= alive_no_wolves:
             winning_team = "wolves"
             dialog.gotoTag("end", "game_loop")
