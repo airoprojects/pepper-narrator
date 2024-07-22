@@ -1,4 +1,5 @@
 qi
+opencv-python
 typing-extensions>=3.7.4
 Flask
 netifaces

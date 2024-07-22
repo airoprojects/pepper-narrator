@@ -6,7 +6,6 @@ import json
 import random
 import threading
 from functools import partial
-
 import animations
 
 
