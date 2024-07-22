@@ -172,3 +172,5 @@ server/*cache.json
 
 # Logs
 err_logs
+
+*.weights
