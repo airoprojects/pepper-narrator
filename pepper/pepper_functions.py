@@ -77,15 +77,17 @@ def assign_roles(players):
 def explain_game(tts, dialog, memory):
     print('chatgpt help us')
     tts.say("test spiegazione")
-    # tts.say("""
-    #         In Lupus in Tabula, each player is secretly assigned a role, such as a Werewolf, Villager, or a special character like the Seer or Witch. I will be the non-playing moderator, overseeing the game to ensure the rules are followed and guiding the narrative. \\
+    tts.say(
+        """
+            In Lupus in Tabula, each player is secretly assigned a role, such as a Werewolf, Villager, or a special character like the Seer or Witch. I will be the non-playing moderator, overseeing the game to ensure the rules are followed and guiding the narrative. \\
 
-    #         The game is divided into two phases: night and day. During the night phase, the Werewolves secretly choose a victim to eliminate, while special characters, like the Seer who can identify a player's role, may use their unique abilities.
+            The game is divided into two phases: night and day. During the night phase, the Werewolves secretly choose a victim to eliminate, while special characters, like the Seer who can identify a player's role, may use their unique abilities.
 
-    #         When the day phase begins, everyone discusses who they think the werewolves are. You all will vote, and the player with the most votes will be lynched, revealing their role. This cycle continues, with players being eliminated and revealing their roles, until one side wins. The Werewolves win by reducing the number of villagers to equal their own, while the villagers win by identifying and eliminating all the werewolves.
+            When the day phase begins, everyone discusses who they think the werewolves are. You all will vote, and the player with the most votes will be lynched, revealing their role. This cycle continues, with players being eliminated and revealing their roles, until one side wins. The Werewolves win by reducing the number of villagers to equal their own, while the villagers win by identifying and eliminating all the werewolves.
 
-    #         As the narrator, I'll oversee the game, making sure everything runs smoothly and providing the necessary prompts and narrative to keep the game engaging. The game is heavily based on discussion, bluffing, and deduction, so be ready for a mix of strategy and social interaction. Special roles like the Seer and Witch will add unique twists that can influence the game's outcome. We'll continue alternating between night and day phases until either the werewolves or villagers achieve their win condition.
-    #         """)
+            As the narrator, I'll oversee the game, making sure everything runs smoothly and providing the necessary prompts and narrative to keep the game engaging. The game is heavily based on discussion, bluffing, and deduction, so be ready for a mix of strategy and social interaction. Special roles like the Seer and Witch will add unique twists that can influence the game's outcome. We'll continue alternating between night and day phases until either the werewolves or villagers achieve their win condition.
+        """
+    )
     memory.insertData("state", "initialization")
     dialog.gotoTag("selection", "game_initialization")
 
@@ -133,7 +135,7 @@ def initialize_game(tts, memory, dialog, database, logger, motion, max_players=8
     return game_info
 
 
-def get_votation(memory, tts, warnings, motion, game_info):
+def get_votation(memory, tts, warnings, motion, game_info, license):
     while memory.getData('votes') == None: 
         if (memory.getData('violence') == 'true' and warnings <= 3 ):
             tts.say("ve ne passate sempre. Bastardi figli di puttana")   
@@ -141,6 +143,7 @@ def get_votation(memory, tts, warnings, motion, game_info):
             animations.calm_down(motion) 
             animations.start_pose(motion)
             warnings += 1
+
             if warnings >= 3 : 
                 tts.say("mo avete rotto il cazzo! tornate quando ve siete clamati, ve saluto") 
                 memory.insertData("game_state", "save")
@@ -160,7 +163,7 @@ def get_votation(memory, tts, warnings, motion, game_info):
         if (memory.getData('joke') == 'true' and game_info['hist'] != []):
             max_index = game_info['hist'].index(max(game_info['hist']))
             player_name = game_info['players'][max_index]
-            tts.say("senti un po' "+ player_name + " ma com'e' non se fida nessuno di te, che hai combinato?")
+            tts.say("senti un po' "+ player_name + " ma com'e' n se fida nessuno de te, che hai combinato?")
             
         time.sleep(0.5)
     return memory.getData('votes')
@@ -190,6 +193,10 @@ def game(game_info, tts, memory, dialog, database, logger, motion):
 
     # subscriber_violence = memory.subscriber('violence')
     # connection_violence = subscriber_violence.signal.connect(lambda a: violence_handler(a, tts, memory, dialog, database, game_info))
+
+    # setup license
+    license = dict()
+    for player in game_info['players']: license[player] = 100
     
     while memory.getData("state") == "game_loop":
         time.sleep(0.5)
@@ -215,7 +222,7 @@ def game(game_info, tts, memory, dialog, database, logger, motion):
             print("who can vote: ", game_info["vote"])
             memory.insertData("game_state", "voting_night") # for server callback
             
-            player_to_kill = get_votation(memory, tts, warnings, motion, game_info)
+            player_to_kill = get_votation(memory, tts, warnings, motion, game_info, license)
             if player_to_kill == None: break
             
             game_info['alive'][player_to_kill] = False
@@ -245,7 +252,7 @@ def game(game_info, tts, memory, dialog, database, logger, motion):
                 memory.insertData('votes', None) 
                 memory.insertData("game_state", "voting_day") # for server callback
 
-                players_votes = get_votation(memory, tts, warnings, motion, game_info) # suppose that this list is complete !!!  
+                players_votes = get_votation(memory, tts, warnings, motion, game_info, license) # suppose that this list is complete !!!  
                 print("INFO players votes: ", players_votes) 
 
                 # make a function for this
