@@ -62,23 +62,8 @@ while(True):
         with open('../../count.txt', 'r') as f:
             value = f.readlines()[0]
 
-        print "found " + value + " humans"
+        print("found " + value + " humans")
 
 
         
 
-
-
- 
-# TODO:
-# """
-
-#     Medium:
-#     1. prendere per il culo quello che e' stato votato piu spesso
-
-#     Hard:
-#     1. un giocatore apre gli occhi
-#     2. un utente che colpisce una categoria particolare di persone
-#     3. un utente se ne va
-
-# """

@@ -34,6 +34,33 @@ def calm_down(motion):
     motion.angleInterpolation(names_arms, angles_2, [1.0]*4, True)
     motion.angleInterpolation(names_arms, angles_1, [1.0]*4, True)
 
+def joke_around(motion): 
+    names = [
+        "HeadYaw",
+        #
+        "RShoulderPitch", 
+        "RShoulderRoll", 
+        "RElbowRoll", 
+        # 
+        "LShoulderPitch", 
+        "LShoulderRoll", 
+        "LElbowRoll", 
+    ]
+
+    # shrug pose
+    angles_shrug = [
+        math.radians(-35.0),
+        #
+        math.radians(-35.0), 
+        math.radians(-30.0), 
+        math.radians(45.0), 
+        #   
+        math.radians(-35.0), 
+        math.radians(30.0), 
+        math.radians(-45.0), 
+    ]
+
+    motion.angleInterpolation(names, angles_shrug, [1.0]*12, True)
     
 def head_no(motion):
     for i in range(2):

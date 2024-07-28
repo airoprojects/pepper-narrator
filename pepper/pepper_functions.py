@@ -137,14 +137,14 @@ def initialize_game(tts, memory, dialog, database, logger, motion, max_players=8
 def get_votation(memory, tts, warnings, motion, game_info, license):
     while memory.getData('votes') == None: 
         if (memory.getData('violence') == 'true' and warnings <= 3 ):
-            tts.say("ve ne passate sempre. Bastardi figli di puttana")   
+            tts.say("Please please lets keep the game enjoiable for everyone!")   
             memory.insertData('violence', 'false')
             animations.calm_down(motion) 
             animations.start_pose(motion)
             warnings += 1
 
             if warnings >= 3 : 
-                tts.say("mo avete rotto il cazzo! tornate quando ve siete clamati, ve saluto") 
+                tts.say("Hey! You are losing track of the goal, we are here to have fun not to insult and discuss \nI fell that is better to pause the game for the moment and start back after everyone has calmed down. Fell free to talk to me ") 
                 memory.insertData("game_state", "save")
                 animations.head_no(motion)
                 animations.start_pose(motion)
@@ -154,15 +154,21 @@ def get_votation(memory, tts, warnings, motion, game_info, license):
 
         if (memory.getData('time') == 'true'):
             late_players = memory.getData('late_players')
-            tts.say(late_players + " ve dovete sbriga!!!")  
+            tts.say(late_players + " please hurry up, the others are wating for you!!!")  
             memory.insertData('time', 'false')
             memory.insertData('late_players', '')
             # TODO: do some animations 
 
-        if (memory.getData('joke') == 'true' and game_info['hist'] != []):
-            max_index = game_info['hist'].index(max(game_info['hist']))
-            player_name = game_info['players'][max_index]
-            tts.say("senti un po' "+ player_name + " ma com'e' n se fida nessuno de te, che hai combinato?")
+        # if (memory.getData('joke') == 'true' and game_info['hist'] != []):
+        if (memory.getData('joke') == 'true' ):
+            # max_index = game_info['hist'].index(max(game_info['hist']))
+            player_name = "leo" #game_info['players'][max_index]
+            tts.say("Hey "+ player_name + " it seems the other are very suspicious about you, may I ask why, what did you do to them? :) ")
+
+            animations.joke_around(motion)
+            time.sleep(3)
+            animations.start_pose(motion)
+            memory.insertData('joke', 'false')
             
         time.sleep(0.5)
     return memory.getData('votes')
