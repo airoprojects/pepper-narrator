@@ -134,7 +134,7 @@ def initialize_game(tts, memory, dialog, database, logger, motion, max_players=8
     return game_info
 
 
-def get_votation(memory, tts, warnings, motion, game_info, license):
+def get_votation(memory, tts, motion, warnings, game_info, license):
     while memory.getData('votes') == None: 
         if (memory.getData('violence') == 'true' and warnings <= 3 ):
             tts.say("Please please lets keep the game enjoiable for everyone!")   
@@ -229,7 +229,8 @@ def game(game_info, tts, motion, memory, dialog, database, logger):
             print("who can vote: ", game_info["vote"])
             memory.insertData("game_state", "voting_night") # for server callback
             
-            player_to_kill = get_votation(tts, motion, warnings, motion, game_info, license)
+            player_to_kill = get_votation(memory, tts, motion, warnings, game_info, license)
+            
             if player_to_kill == None: break
             
             game_info['alive'][player_to_kill] = False
@@ -259,11 +260,11 @@ def game(game_info, tts, motion, memory, dialog, database, logger):
                 memory.insertData('votes', None) 
                 memory.insertData("game_state", "voting_day") # for server callback
 
-                players_votes = get_votation(memory, tts, warnings, motion, game_info, license) # suppose that this list is complete !!!  
+                players_votes = get_votation(memory, tts, motion, warnings, game_info, license) # suppose that this list is complete !!!  
                 print("INFO players votes: ", players_votes) 
 
                 # make a function for this
-                if game_info['hist'] == [] : game_info['hist'] = players_votes
+                if 'hist' in game_info and game_info['hist'] == [] : game_info['hist'] = players_votes
                 else: game_info['hist'] = [x + y for x, y in zip(game_info['hist'], players_votes)]
 
                 print("INFO: ", game_info['hist'])

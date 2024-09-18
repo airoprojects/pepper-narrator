@@ -92,7 +92,7 @@ if __name__ == "__main__":
             game_state_prev = game_state
         else: 
             time.sleep(1)
-            print("wating...")
+            print("waiting...")
 
         if memory.getData('state') == "end":  
             print("interrupting bridge connection!")
