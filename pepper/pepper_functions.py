@@ -16,8 +16,8 @@ sys.path.append(parent_dir)
 from utils.utils import save_data_to_json
 
 
-def recovery_game_handler(game_id, tts, memory, dialog, database, game_info):
-    tts.say("Let me check if game #" + str(game_id) + " can be restored...")
+def recovery_game_handler(game_id, tts, motion, memory, dialog, database, game_info):
+    animations.general_talking(tts, motion, "Let me check if game #" + str(game_id) + " can be restored...")
     
     if str(game_id) in database['games']:
         game = database['games'][str(game_id)]
@@ -26,25 +26,25 @@ def recovery_game_handler(game_id, tts, memory, dialog, database, game_info):
                 game_info[key] = value
             dialog.gotoTag("end_init_old", "game_initialization")
         else:
-            tts.say("Recovery is not always possible, everything has an end.")
+            animations.general_talking(tts, motion, "Recovery is not always possible, everything has an end.")
             dialog.gotoTag("endedGameId", "game_initialization")
     else:
-        tts.say("Do not lie to me, this game never existed.")
+        animations.general_talking(tts, motion, "Do not lie to me, this game never existed.")
         dialog.gotoTag("wrongGameId", "game_initialization")
     
 
-def new_player_handler(last_player_name, tts, memory, dialog, database, max_players, game_info):
+def new_player_handler(last_player_name, tts, motion, memory, dialog, database, max_players, game_info):
 
     if(last_player_name in game_info['players']):
-        tts.say(last_player_name + ", you are already registered.")
+        animations.general_talking(tts, motion, last_player_name + ", you are already registered.")
         dialog.gotoTag("name", "game_initialization")
         return None
     elif(last_player_name in database['players']):
         # TODO check if is the same player or a new one with the same name -> ask to insert a new username
-        tts.say(last_player_name + ", Nice to see you again...")
+        animations.general_talking(tts, motion, last_player_name + ", Nice to see you again...")
         database['players'][last_player_name]['games'] += 1
     else:
-        tts.say(last_player_name + ", nice to meet you...")
+        animations.general_talking(tts, motion, last_player_name + ", nice to meet you...")
         database['players'][last_player_name] = {}
         database['players'][last_player_name]['games'] = 1
         database['players'][last_player_name]['victories'] = 0
@@ -73,10 +73,10 @@ def assign_roles(players):
     return roles
 
 
-def explain_game(tts, dialog, memory):
+def explain_game(tts, motion, dialog, memory):
     print('chatgpt help us')
     tts.say("test spiegazione")
-    tts.say(
+    animations.general_talking(tts, motion, 
         """
             In Lupus in Tabula, each player is secretly assigned a role, such as a Werewolf, Villager, or a special character like the Seer or Witch. I will be the non-playing moderator, overseeing the game to ensure the rules are followed and guiding the narrative. \\
 
@@ -111,11 +111,11 @@ def initialize_game(tts, memory, dialog, database, logger, motion, max_players=8
     }
     
     subscriber_name = memory.subscriber("last_player_name") 
-    connection_name = subscriber_name.signal.connect(lambda name: new_player_handler(name, tts, memory, dialog, database, max_players, game_info))
+    connection_name = subscriber_name.signal.connect(lambda name: new_player_handler(name, tts, motion, memory, dialog, database, max_players, game_info))
     subscriber_recovery = memory.subscriber("recovered_game_id")
-    connection_recovery = subscriber_recovery.signal.connect(lambda name: recovery_game_handler(name, tts, memory, dialog, database, game_info))
+    connection_recovery = subscriber_recovery.signal.connect(lambda name: recovery_game_handler(name, tts, motion, memory, dialog, database, game_info))
     while memory.getData("state") not in ["ready_new", "ready_old", "end"]:
-        if memory.getData("state") == 'explain': explain_game(tts, dialog, memory)
+        if memory.getData("state") == 'explain': explain_game(tts, motion, dialog, memory)
         time.sleep(0.5)
     
     # cleaning ALDialog connection and deactivating initialization topic        
@@ -154,10 +154,9 @@ def get_votation(memory, tts, warnings, motion, game_info, license):
 
         if (memory.getData('time') == 'true'):
             late_players = memory.getData('late_players')
-            tts.say(late_players + " please hurry up, the others are wating for you!!!")  
+            animations.general_talking(tts, motion, late_players + " please hurry up, the others are wating for you!!!")  
             memory.insertData('time', 'false')
             memory.insertData('late_players', '')
-            # TODO: do some animations 
 
         # if (memory.getData('joke') == 'true' and game_info['hist'] != []):
         if (memory.getData('joke') == 'true' ):
@@ -174,12 +173,15 @@ def get_votation(memory, tts, warnings, motion, game_info, license):
     return memory.getData('votes')
 
 
-def violence_handler(a, tts, memory, dialog, database, game_info):
+def violence_handler(a, tts, motion, memory, dialog, database, game_info):
     if(a == 'ciao'): 
-        tts.say("ve ne passate sempre. Bastardi figli di puttana")    
+        tts.say("ve ne passate sempre. Bastardi figli di puttana")   
+        animations.calm_down(motion) 
+        animations.start_pose(motion)
+         
 
 
-def game(game_info, tts, memory, dialog, database, logger, motion):
+def game(game_info, tts, motion, memory, dialog, database, logger):
     game_initialization_topic =  '/home/robot/playground/pepper-narrator/pepper/topics/game_loop.top'
     topic_name = dialog.loadTopic(game_initialization_topic)
     dialog.activateTopic(topic_name)
@@ -197,7 +199,7 @@ def game(game_info, tts, memory, dialog, database, logger, motion):
     print(game_info['roles'])
 
     # subscriber_violence = memory.subscriber('violence')
-    # connection_violence = subscriber_violence.signal.connect(lambda a: violence_handler(a, tts, memory, dialog, database, game_info))
+    # connection_violence = subscriber_violence.signal.connect(lambda a: violence_handler(a, tts, motion, memory, dialog, database, game_info))
 
     # setup license
     license = dict()
@@ -212,14 +214,14 @@ def game(game_info, tts, memory, dialog, database, logger, motion):
         print("Round {}, {}".format(game_info['round'], "night" if game_info['night'] else "day"))
         
         if game_info['night']:
-            tts.say("It is night, close your eyes.")
+            animations.general_talking(tts, motion, "It is night, close your eyes.")
             memory.insertData('votes', None) 
 
             # wolves can now vote
             for idx, value in enumerate(zip(game_info["roles"], game_info["alive"])):
                 role, alive = value
                 if role == "wolf" and alive: game_info["vote"][idx] = True
-            tts.say("Wolves, you have to choose your victim.")
+            animations.general_talking(tts, motion, "Wolves, you have to choose your victim.")
 
             # uptate game info to tell web page who can vote
             memory.insertData('game_info', game_info)
@@ -227,13 +229,13 @@ def game(game_info, tts, memory, dialog, database, logger, motion):
             print("who can vote: ", game_info["vote"])
             memory.insertData("game_state", "voting_night") # for server callback
             
-            player_to_kill = get_votation(memory, tts, warnings, motion, game_info, license)
+            player_to_kill = get_votation(tts, motion, warnings, motion, game_info, license)
             if player_to_kill == None: break
             
             game_info['alive'][player_to_kill] = False
             player_to_kill_name =  game_info['players'][player_to_kill]
-            tts.say("The sun is rising. You can open your eyes again.")
-            tts.say("I\'m so sorry to tell you that {} is dead, what a tragedy.".format(player_to_kill_name.upper()))
+            animations.general_talking(tts, motion, "The sun is rising. You can open your eyes again.")
+            animations.general_talking(tts, motion, "I\'m so sorry to tell you that {} is dead, what a tragedy.".format(player_to_kill_name.upper()))
             game_info['night'] = False
             
             # disable vote
@@ -247,7 +249,7 @@ def game(game_info, tts, memory, dialog, database, logger, motion):
             # everyone can now vote
             for idx, alive in enumerate(game_info["alive"]):
                 if alive: game_info["vote"][idx] = True
-            tts.say("Now you must decide who is responsible for this!")
+            animations.general_talking(tts, motion, "Now you must decide who is responsible for this!")
 
             memory.insertData('game_info', game_info)
             majority = False
@@ -271,11 +273,11 @@ def game(game_info, tts, memory, dialog, database, logger, motion):
 
                 if players_votes.count( max_votes ) > 1:
                     print("again")
-                    tts.say("Please vote again. You must be more united in your choice.")
+                    animations.general_talking(tts, motion, "Please vote again. You must be more united in your choice.")
                     tie_players = [id for id in range(len(players_votes)) if players_votes[id] == max_votes]
                     msg = " ".join(game_info['player'][id] for id in tie_players) + "what do you have to say about your innocence?"
-                    tts.say(msg) # TODO improve using names of most voted players
-                    # tts.say("X and Y, what do you have to say about your innocence?") # TODO improve using names of most voted players
+                    animations.general_talking(tts, motion, msg) # TODO improve using names of most voted players
+                    # animations.general_talking(motion, tts, "X and Y, what do you have to say about your innocence?") # TODO improve using names of most voted players
                     # disable voting for tie players
                     for id in tie_players:
                         game_info['vote'][id] = False
@@ -284,7 +286,7 @@ def game(game_info, tts, memory, dialog, database, logger, motion):
                     majority = True
                     player_to_kill = players_votes.index(max_votes) 
                     player_to_kill_name =  game_info['players'][player_to_kill]
-                    tts.say("So you all agree that {} is responsible, interesting...".format(player_to_kill_name.upper()))
+                    animations.general_talking(tts, motion, "So you all agree that {} is responsible, interesting...".format(player_to_kill_name.upper()))
                     game_info['alive'][player_to_kill] = False
                     game_info['night'] = True
                     print(player_to_kill, player_to_kill_name)
@@ -302,14 +304,14 @@ def game(game_info, tts, memory, dialog, database, logger, motion):
         if alive_wolves == 0 :
             winning_team = "villagers"
             dialog.gotoTag("end", "game_loop")
-            tts.say("Villagers win")
+            animations.general_talking(motion, tts, "Villagers win")
             memory.insertData("game_state", "end")
             memory.insertData("winning_team", winning_team)
 
         elif alive_wolves >= alive_no_wolves:
             winning_team = "wolves"
             dialog.gotoTag("end", "game_loop")
-            tts.say("Wolves win")
+            animations.general_talking(motion, tts, "Wolves win")
             memory.insertData("game_state", "end")
             memory.insertData("winning_team", winning_team)
     

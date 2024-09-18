@@ -72,5 +72,29 @@ def head_yes(motion):
     for i in range(2):
         motion.angleInterpolation("HeadPitch", math.radians(25.0), 1.0, True)
         motion.angleInterpolation("HeadPitch", math.radians(-25.0), 1.0, True)
+
+
+def general_talking_animation(motion):
+    names_hip_and_head = ["HipRoll", "HeadPitch"]
+    names_right = ["RElbowRoll", "RElbowYaw", "RShoulderPitch", "RShoulderRoll", "RWristYaw", "RHand"]
+    names_left  = ["LElbowRoll", "LElbowYaw", "LShoulderPitch", "LShoulderRoll", "LWristYaw", "LHand"]
+    names = names_hip_and_head + names_right + names_left
+
+    angles_hh_0  = [math.radians(1), math.radians(-26)]
+    angles_right_0 = [math.radians(30), math.radians(60), math.radians(70), math.radians(-10), math.radians(15), 0.5]
+    angles_left_0  = [math.radians(-30), math.radians(-60), math.radians(50), math.radians(10), math.radians(-15), 0.5]
+    angles_0 = angles_hh_0 + angles_right_0 + angles_left_0
     
+    angles_hh_1  = [math.radians(-1), math.radians(-17)]#, math.radians(10)]
+    angles_right_1 = [math.radians(35), math.radians(55), math.radians(90), math.radians(-8), math.radians(10), 0.3]
+    angles_left_1  = [math.radians(-35), math.radians(-55), math.radians(90), math.radians(8), math.radians(-10), 0.3]
+    angles_1 = angles_hh_1 + angles_right_1 + angles_left_1
     
+    for i in range(2):
+        motion.angleInterpolation(names, angles_0, 1, True)
+        motion.angleInterpolation(names, angles_1, 1, True)
+    
+def general_talking(tts, motion, sentence):
+    tts.say(sentence)
+    general_talking_animation(motion)
+    start_pose(motion)
