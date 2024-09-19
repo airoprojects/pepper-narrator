@@ -10,16 +10,20 @@ function generatePlayerButtons(players) {
     const playersListDiv = document.getElementById('playersList');
     playersListDiv.innerHTML = ''; // Clear previous content
 
+    // Generate a new button for each player
     players.forEach((player, index) => {
         const button = document.createElement('button');
         button.textContent = player; // Set the button text to the player's name
         button.id = `player-${index}`; // Set the button id to the index of the player
+        button.classList.add('modern-button');
         button.onclick = () => {
             window.location.href = `player.html?id=${index}`;
         };
+        
         playersListDiv.appendChild(button);
     });
 }
+
 
 async function checkGameStatus() {
     let game_info = await fetchData();

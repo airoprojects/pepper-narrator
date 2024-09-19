@@ -74,11 +74,14 @@ if __name__ == "__main__":
     print("session: ", session)
     memory = session.service("ALMemory")
     
-    game_state_prev = None
+    game_state_prev = None 
+    game_state = None
     while True:
-        game_state = memory.getData('game_state') # correct
-        print("Game state: {} ##################################".format(game_state))
-
+        try: 
+            game_state = memory.getData('game_state') # correct
+            print("Game state: {} ##################################".format(game_state))
+        except:
+            pass
         if game_state != game_state_prev:
             game_info = format_dictionary_from_memory(memory.getData('game_info'))
             print("game state: ", game_state)
@@ -100,4 +103,10 @@ if __name__ == "__main__":
 
     # closing connection
     client_socket.close()
+
+
+
+
+  
+
     

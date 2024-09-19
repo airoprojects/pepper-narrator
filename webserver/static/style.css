@@ -35,3 +35,94 @@ h2 {
     margin-top: 20px;
     padding-top: 190px;
 }
+
+
+
+
+#playersList {
+    display: flex;
+    flex-wrap: wrap; /* Makes the buttons wrap to the next line if necessary */
+    gap: 10px; /* Space between buttons */
+    justify-content: center; /* Center the buttons horizontally */
+    padding: 20px;
+}
+
+.modern-button {
+    background-color: #6200ea; /* Modern purple color */
+    color: #ffffff; /* White text color */
+    border: none; /* Remove default border */
+    border-radius: 8px; /* Rounded corners */
+    padding: 12px 20px; /* Padding inside the button */
+    font-size: 16px; /* Slightly larger font size */
+    cursor: pointer; /* Cursor change on hover */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition */
+}
+
+.modern-button:hover {
+    background-color: #3700b3; /* Darker shade on hover */
+    transform: translateY(-2px); /* Slight lift effect */
+}
+
+.modern-button:active {
+    background-color: #3700b3; /* Maintain darker shade on click */
+    transform: translateY(0); /* No lift effect */
+}
+
+.modern-button:focus {
+    outline: none; /* Remove default focus outline */
+    box-shadow: 0 0 0 4px rgba(98, 0, 234, 0.3); /* Custom focus ring */
+}
+
+
+/* Styles for the select dropdown */
+.custom-select {
+    background-color: #ffffff; /* White background */
+    color: #333333; /* Dark text color */
+    border: 2px solid #6200ea; /* Border with the same purple color as buttons */
+    border-radius: 8px; /* Rounded corners */
+    padding: 10px; /* Padding inside the select */
+    font-size: 16px; /* Slightly larger font size */
+    cursor: pointer; /* Cursor change on hover */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    transition: background-color 0.3s ease, border-color 0.3s ease; /* Smooth transition */
+}
+
+/* Hover effect for the select dropdown */
+.custom-select:hover {
+    background-color: #f0f0f0; /* Light gray background on hover */
+    border-color: #3700b3; /* Darker border on hover */
+}
+
+/* Focus effect for the select dropdown */
+.custom-select:focus {
+    outline: none; /* Remove default focus outline */
+    box-shadow: 0 0 0 4px rgba(98, 0, 234, 0.3); /* Custom focus ring */
+}
+
+/* Option styles */
+.custom-select option {
+    padding: 10px; /* Add padding to options */
+}
+
+/* Disabled state */
+.modern-button:disabled {
+    background-color: #cccccc; /* Light gray background */
+    color: #666666; /* Dark gray text */
+    cursor: not-allowed; /* Show not-allowed cursor */
+    opacity: 0.6; /* Reduce opacity */
+    box-shadow: none; /* Remove shadow */
+    transform: none; /* No lift effect */
+}
+
+/* Disabled state for the select dropdown */
+.custom-select:disabled {
+    background-color: #f0f0f0; /* Light gray background */
+    color: #999999; /* Gray text */
+    border-color: #cccccc; /* Lighter border color */
+    cursor: not-allowed; /* Show not-allowed cursor */
+    opacity: 0.6; /* Reduce opacity */
+}
+
+
+

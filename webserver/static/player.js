@@ -51,6 +51,7 @@ function generatePlayersList(players, playerId, alive, roles, night) {
     const select = document.createElement('select');
     select.name = 'playerVotes';
     select.id = 'playerVotes';
+    select.className = 'custom-select';
     console.log('night: ', night)
     if (night) {
         players.forEach((player, index) => {
@@ -81,6 +82,7 @@ function generatePlayersList(players, playerId, alive, roles, night) {
     // Create vote button
     const button = document.createElement('button');
     button.textContent = "Vote Now";
+    button.className = 'modern-button'; // Apply the CSS class for styling
     button.onclick = () => {
         const selectedValue = document.getElementById('playerVotes').value;
         console.log("Selected option value: ", selectedValue);

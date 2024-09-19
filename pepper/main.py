@@ -7,6 +7,8 @@ import argparse
 from copy import deepcopy
 from functools import partial
 
+import signal
+import sys
 
 # add project root to sys path
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -16,7 +18,20 @@ sys.path.append(parent_dir)
 from utils.utils import load_data_from_json, save_data_to_json, reset_memory
 from pepper_functions import *        
 
+
+global memory
+
+
+def signal_handler(sig, frame):
+    print("Received signal ",  sig, " Cleaning up...")
+    reset_memory(memory)
+    sys.exit(0)  # Exit the program cleanly
+
+
 def main():
+    
+    signal.signal(signal.SIGINT, signal_handler)  # Handle Ctrl+C
+    signal.signal(signal.SIGTERM, signal_handler) # Handle kill command
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-p','--port', type=str, help="Insert pepper port")
@@ -46,8 +61,8 @@ def main():
     
     database = load_data_from_json(database_filename)
     memory.insertData("state", "initialization")
-    # game_info = initialize_game(tts, memory, dialog, database, logger, motion)
-    game_info = deepcopy(database["games"]["1"]) 
+    game_info = initialize_game(tts, memory, dialog, database, logger, motion)
+    # game_info = deepcopy(database["games"]["1"]) 
     if memory.getData("state") == "end": return None
     
     tts.say("Starting...")
@@ -55,10 +70,8 @@ def main():
     game(game_info, tts, motion, memory, dialog, database, logger)
     # save_data_to_json(database_filename, database)
 
-    
     return 0 
 
-    
-    
-if __name__ == "__main__":
+       
+if __name__ == "__main__": 
     main()

@@ -13,7 +13,7 @@ def save_data_to_json(filename, data):
     json.dump(data, f, indent=4)
 
 def reset_memory(memory):
-    keys_to_remove = ["database_filename", "state", "violence"]  # Aggiungi tutte le chiavi che vuoi resettare qui
+    keys_to_remove = ["database_filename", "state", "violence","game_state"]  # Aggiungi tutte le chiavi che vuoi resettare qui
     for key in keys_to_remove:
         try:
             memory.removeData(key)

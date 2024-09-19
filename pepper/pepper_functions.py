@@ -227,7 +227,9 @@ def game(game_info, tts, motion, memory, dialog, database, logger):
             memory.insertData('game_info', game_info)
             print("changed game state")
             print("who can vote: ", game_info["vote"])
+            
             memory.insertData("game_state", "voting_night") # for server callback
+            # fatto.wait()
             
             player_to_kill = get_votation(memory, tts, motion, warnings, game_info, license)
             
@@ -238,6 +240,7 @@ def game(game_info, tts, motion, memory, dialog, database, logger):
             animations.general_talking(tts, motion, "The sun is rising. You can open your eyes again.")
             animations.general_talking(tts, motion, "I\'m so sorry to tell you that {} is dead, what a tragedy.".format(player_to_kill_name.upper()))
             game_info['night'] = False
+
             
             # disable vote
             game_info["vote"] = [False for players in game_info["players"]]
