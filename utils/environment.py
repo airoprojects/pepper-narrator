@@ -46,9 +46,10 @@ while(True):
         memory.insertData('late_players', late_players)
         print(late_players)
     if(event == 'joke'): 
-        # late_players = raw_input('tease players: ')
+        # INSERT THE PLAYER TARGETED
+        joke_player = raw_input('tease players: ')
         memory.insertData('joke', 'true')
-        # memory.insertData('late_players', late_players)
+        memory.insertData('joke_player', joke_player)
         # print(late_players)
     if(event == 'opened_eyes'): 
         memory.insertData('opened_eyes', 'true')

@@ -160,14 +160,18 @@ def get_votation(memory, tts, motion, warnings, game_info, license):
 
         # if (memory.getData('joke') == 'true' and game_info['hist'] != []):
         if (memory.getData('joke') == 'true' ):
+
             # max_index = game_info['hist'].index(max(game_info['hist']))
-            player_name = "leo" #game_info['players'][max_index]
+            # player_name = "leo" #game_info['players'][max_index]
+            player_name = memory.getData('joke_player')
+
             tts.say("Hey "+ player_name + " it seems the other are very suspicious about you, may I ask why, what did you do to them? :) ")
 
             animations.joke_around(motion)
             time.sleep(3)
             animations.start_pose(motion)
             memory.insertData('joke', 'false')
+            memory.insertData('joke_player','')
             
         time.sleep(0.5)
     return memory.getData('votes')
@@ -175,7 +179,7 @@ def get_votation(memory, tts, motion, warnings, game_info, license):
 
 def violence_handler(a, tts, motion, memory, dialog, database, game_info):
     if(a == 'ciao'): 
-        tts.say("ve ne passate sempre. Bastardi figli di puttana")   
+        tts.say("Please, let's keep things fair, or I may have to stop the game. Remember, the purpose of playing any game is to have fun and enjoy each other\'s company, not to create conflicts.")   
         animations.calm_down(motion) 
         animations.start_pose(motion)
          
