@@ -39,18 +39,23 @@ memory.insertData('opened_eyes', 'false')
 
 while(True):
     event = raw_input('Trigger Event > ')
-    if(event == 'violence'): memory.insertData('violence', 'true')
+
+    if(event == 'violence'): 
+        memory.insertData('violence', 'true')
+
     if(event == 'time'): 
         late_players = raw_input('late players: ')
         memory.insertData('time', 'true')
         memory.insertData('late_players', late_players)
         print(late_players)
+
     if(event == 'joke'): 
         # INSERT THE PLAYER TARGETED
         joke_player = raw_input('tease players: ')
         memory.insertData('joke', 'true')
         memory.insertData('joke_player', joke_player)
         # print(late_players)
+        
     if(event == 'opened_eyes'): 
         memory.insertData('opened_eyes', 'true')
 

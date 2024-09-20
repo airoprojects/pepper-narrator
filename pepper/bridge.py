@@ -50,6 +50,8 @@ def votes_handler(response, game_state, game_info, memory):
 
 if __name__ == "__main__":
 
+    time.sleep(5)
+
     # connection to python socket
     # local machine ip
     result = subprocess.check_output("hostname -I | awk '{print $1}'", shell=True)

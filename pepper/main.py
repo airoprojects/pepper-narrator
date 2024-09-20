@@ -29,6 +29,8 @@ def signal_handler(sig, frame):
 
 
 def main():
+
+    time.sleep(5)
     
     signal.signal(signal.SIGINT, signal_handler)  # Handle Ctrl+C
     signal.signal(signal.SIGTERM, signal_handler) # Handle kill command
