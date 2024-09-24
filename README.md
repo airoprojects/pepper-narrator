@@ -1,27 +1,18 @@
-# pepper-narrator
+# Pepper Narrator
 HRI Project - Sapienza (AIRO) 2023/2024
 
 ---
 ## Table of content
 - [Introduction](#introduction)
+- [How to run](#how-to-run)
 - [Resources](#resources)
 ---
 
 
 # Introduction
+The project involves creating a Human-Robot-Interaction task using Pepper, a semi-humanoid robot, to play the role-playing game "Lupus in fibula" with human participants. The robot interacts with players by using its sensory and communication functions to detect players, monitor emotions, enforce game rules, and maintain an enjoyable atmosphere. It can recognize if players are breaking rules, like keeping their eyes closed when required, and can use dialogue and gestures to engage participants and continue a paused game if needed.
 
-# Resources
-To explore some resources used/related to the project look here [resources](resources)
-
-# tmp 
-## TODO LIST
-
-- [X] aggiornare il controllo sulle votazioni
-- [X] aggiornare lo stato della pagina web (giorno/notte vivo/morto)
-- [ ] fix bug i lupi compaiono nella lista di giocatori da votare nella notte
-
-### How to run a simulation simulation
-
+# How to run 
 0. Do once
 ```
 docker network create hri-net --subnet=192.168.1.0/8
@@ -58,6 +49,8 @@ cd pepper-narrator/pepper
 python bridge.py
 ```
 
+# Resources
+To explore some resources used/related to the project look here [resources](resources)
 
 
 
