@@ -74,7 +74,6 @@ def assign_roles(players):
 
 
 def explain_game(tts, motion, dialog, memory):
-    print('chatgpt help us')
     tts.say("test spiegazione")
     animations.general_talking(tts, motion, 
         """
